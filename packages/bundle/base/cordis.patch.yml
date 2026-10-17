@@ -300,6 +300,14 @@
       config:
         sampleOverCapGlobResults: false
 
+    # Semantic + structural code search over a senior-code-mcp index. Off
+    # unless DSH_CODE_SEARCH_COMMAND names the senior-code-search executable.
+    - id: tool-code-search
+      name: '@deepseek-ai/dsh-tool-code-search'
+      disabled: !!js '!process.env.DSH_CODE_SEARCH_COMMAND'
+      config:
+        command: !!js '[process.env.DSH_CODE_SEARCH_COMMAND ?? ""]'
+
     - id: agent-instructions
       name: '@deepseek-ai/dsh-agent-instructions'
       config:
