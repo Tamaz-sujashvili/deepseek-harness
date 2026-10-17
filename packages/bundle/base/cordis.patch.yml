@@ -289,6 +289,13 @@
     - id: tool-jobs
       name: '@deepseek-ai/dsh-tool-jobs'
 
+    # Denies edit/write calls that add syntax errors (tree-sitter parse of the
+    # file before and after). Off unless DSH_EDIT_SYNTAX_GUARD is set. Mounted
+    # before fs-observation-policy so the read-before-write decision runs first.
+    - id: edit-syntax-guard
+      name: '@deepseek-ai/dsh-edit-syntax-guard'
+      disabled: !!js '!process.env.DSH_EDIT_SYNTAX_GUARD'
+
     - id: fs-observation-policy
       name: '@deepseek-ai/dsh-fs-observation-policy'
 
@@ -355,6 +362,13 @@
 
     - id: token-meter
       name: '@deepseek-ai/dsh-token-meter'
+
+    # Replaces old large tool results with one placeholder line, in batches,
+    # before each step. Off unless DSH_OBSERVATION_MASK is set. Mounted before
+    # compaction-basic so its agent/pre-step pass runs before summarization.
+    - id: observation-mask
+      name: '@deepseek-ai/dsh-compaction-observation-mask'
+      disabled: !!js '!process.env.DSH_OBSERVATION_MASK'
 
     - id: compaction-basic
       name: '@deepseek-ai/dsh-compaction-basic'

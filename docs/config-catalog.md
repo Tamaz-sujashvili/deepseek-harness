@@ -732,6 +732,29 @@ export interface ModelCompactPolicyConfig extends CompactionPolicyConfig {
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-compaction-basic -->
 
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-compaction-observation-mask -->
+<a id="deepseek-aidsh-compaction-observation-mask"></a>
+
+## `@deepseek-ai/dsh-compaction-observation-mask`
+
+- `inject`: `tokenMeter`
+- `source`: [`packages/compaction/compaction-observation-mask/src/index.ts:46`](../packages/compaction/compaction-observation-mask/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `compaction-observation-mask` (`cordis.yml` `config:`). */
+export interface Config {
+  /** Newest tool results that always stay verbatim. */
+  keepRecent?: number
+  /** Results at or below this many characters are never masked. */
+  minChars?: number
+  /** Minimum number of qualifying results before one masking pass runs. */
+  batchSize?: number
+  /** Maximum characters of tool arguments quoted in the placeholder. */
+  maxArgumentChars?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-compaction-observation-mask -->
+
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-compaction-tool-result-pruner -->
 <a id="deepseek-aidsh-compaction-tool-result-pruner"></a>
 
@@ -834,6 +857,32 @@ export interface Config {
 }
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-deepseek-account-platform -->
+
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-edit-syntax-guard -->
+<a id="deepseek-aidsh-edit-syntax-guard"></a>
+
+## `@deepseek-ai/dsh-edit-syntax-guard`
+
+- `inject`: `fs`
+- `source`: [`packages/fs/edit-syntax-guard/src/index.ts:72`](../packages/fs/edit-syntax-guard/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `edit-syntax-guard` (`cordis.yml` `config:`). */
+export interface Config {
+  /** Lower-case file extension (with dot) to grammar. Extensions not listed are not checked. */
+  extensions?: Record<string, GrammarName>
+  /** Files larger than this (UTF-16 code units of the new text) are not checked. */
+  maxFileBytes?: number
+  /** Context lines shown on each side of the first new problem. */
+  contextLines?: number
+  /** Problems counted per parse; a file already at this count is not checked. */
+  maxProblems?: number
+}
+
+/** Grammars shipped by `@vscode/tree-sitter-wasm` that the guard can load. */
+export type GrammarName = 'python' | 'javascript' | 'typescript' | 'tsx' | 'go' | 'rust' | 'java'
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-edit-syntax-guard -->
 
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-experimental-agent-team -->
 <a id="deepseek-aidsh-experimental-agent-team"></a>

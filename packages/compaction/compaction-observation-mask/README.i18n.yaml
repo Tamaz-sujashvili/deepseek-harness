@@ -1,0 +1,55 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/compaction/compaction-observation-mask/README.md
+/:
+  en: 1f591f05c0351a3a
+  zh: a59826e249a09e3f
+/deepseek-ai-dsh-compaction-observation-mask:
+  en: 083a5f41c67c9147
+  zh: a402cf79189c24e1
+/deepseek-ai-dsh-compaction-observation-mask/summary:
+  en: 5796331cca91023e
+  zh: f7dc1cfa6e6bcd0b
+/deepseek-ai-dsh-compaction-observation-mask/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-compaction-observation-mask/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-compaction-observation-mask/use-this-package/setup:
+  en: 7ea8fe1c67a395de
+  zh: 7e3c885ecc9b6755
+/deepseek-ai-dsh-compaction-observation-mask/use-this-package/configuration:
+  en: 8643ce1b020b65bd
+  zh: 02df19e4d8645996
+/deepseek-ai-dsh-compaction-observation-mask/understand-the-implementation:
+  en: ff2ee8b1ee0a20d7
+  zh: b131882b7921bb7e
+/deepseek-ai-dsh-compaction-observation-mask/further-exploration:
+  en: 5987aac6ec83d68b
+  zh: a083caba7c53a2ac
+/deepseek-ai-dsh-compaction-observation-mask/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-compaction-observation-mask/model-experience/masked-tool-results:
+  en: 09ba6982fca40ffb
+  zh: e4f8614f0eaadd7e
+/deepseek-ai-dsh-compaction-observation-mask/model-experience/masked-tool-results/what-the-model-sees:
+  en: b291cadb9d77df32
+  zh: c913979c7148ef4c
+/deepseek-ai-dsh-compaction-observation-mask/model-experience/masked-tool-results/what-the-model-sees/placeholder:
+  en: 1fae0cd7b2fb9762
+  zh: 20c426d16d93c7d1
+/deepseek-ai-dsh-compaction-observation-mask/model-experience/masked-tool-results/token-effect:
+  en: 9a776f0f7f5705df
+  zh: 698384f30400c10b
+/deepseek-ai-dsh-compaction-observation-mask/model-experience/masked-tool-results/kv-cache-effect:
+  en: cd7b056903ddb914
+  zh: dd970c53c2d10a8a
+/deepseek-ai-dsh-compaction-observation-mask/known-limitations-and-deferred-work:
+  en: 46d94eee14e6f647
+  zh: 8344a53a0f2741e8
+/deepseek-ai-dsh-compaction-observation-mask/known-limitations-and-deferred-work/dev-note:
+  en: 36b1f90576a05c92
+  zh: f4650e8295f9f1be

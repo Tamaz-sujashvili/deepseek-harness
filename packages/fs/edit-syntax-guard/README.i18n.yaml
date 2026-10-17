@@ -1,0 +1,55 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/fs/edit-syntax-guard/README.md
+/:
+  en: 5028ab5d157a10ac
+  zh: 1d120e29661265f0
+/deepseek-ai-dsh-edit-syntax-guard:
+  en: ea90595dc02a9fa1
+  zh: 369608feb3c5c773
+/deepseek-ai-dsh-edit-syntax-guard/summary:
+  en: b1c8d4f98c04e0f2
+  zh: 268dc06c30354404
+/deepseek-ai-dsh-edit-syntax-guard/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-edit-syntax-guard/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-edit-syntax-guard/use-this-package/setup:
+  en: b17bcdac83056e97
+  zh: 3927d394cdf1b79d
+/deepseek-ai-dsh-edit-syntax-guard/use-this-package/configuration:
+  en: 5010ae745fe23960
+  zh: 234a212dbaade45d
+/deepseek-ai-dsh-edit-syntax-guard/understand-the-implementation:
+  en: 4a171d00eea25367
+  zh: 7ececb45ffe1fae0
+/deepseek-ai-dsh-edit-syntax-guard/further-exploration:
+  en: 6242bfe82a3c2c90
+  zh: 5933737de4a02020
+/deepseek-ai-dsh-edit-syntax-guard/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-edit-syntax-guard/model-experience/denial:
+  en: 6e40d3f19a0daaa2
+  zh: faa187520aa07cdb
+/deepseek-ai-dsh-edit-syntax-guard/model-experience/denial/what-the-model-sees:
+  en: ea6338356c912d10
+  zh: 6b579b72124e4356
+/deepseek-ai-dsh-edit-syntax-guard/model-experience/denial/what-the-model-sees/example-denial:
+  en: 2aaa9e70279dd64d
+  zh: ff558795c1a7dd3c
+/deepseek-ai-dsh-edit-syntax-guard/model-experience/denial/token-effect:
+  en: 0951ade6da646f53
+  zh: 28f786ada03c3538
+/deepseek-ai-dsh-edit-syntax-guard/model-experience/denial/kv-cache-effect:
+  en: ba87e1a97ce5a340
+  zh: c9e75f97c741463c
+/deepseek-ai-dsh-edit-syntax-guard/known-limitations-and-deferred-work:
+  en: 8263f9aac3b2aa9c
+  zh: 2906874925630e9e
+/deepseek-ai-dsh-edit-syntax-guard/known-limitations-and-deferred-work/dev-note:
+  en: d6acb1a3b50d0c66
+  zh: b77ac1f8bf8fea8a
