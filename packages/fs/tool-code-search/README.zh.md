@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-使用 `dsh-tool-code-search` 为模型提供基于 [senior-code-mcp](https://github.com/Tamaz-sujashvili/senior-code-mcp) 索引的语义与结构化代码搜索。`code_search` 返回与自然语言或代码查询匹配的函数、类和方法，以及它们的源码和图邻居。`code_related` 返回所指定符号的调用方、被调用方和导入。精确标识符、字符串和正则表达式仍使用 `dsh-tool-fs-search`（`grep`、`glob`）。
+使用 `dsh-tool-code-search` 为模型提供基于 [senior-code-mcp](https://github.com/Tamaz-sujashvili/senior-code-mcp) 索引的语义与结构化代码搜索。`code_search` 返回与自然语言或代码查询匹配的函数、类和方法，以及它们的源码和图邻居。`code_related` 返回所指定符号的调用方、被调用方和导入。`code_outline` 列出一个文件的定义及其行范围，`code_read_symbol` 返回一个定义的精确源码；两者都在调用时解析文件，无需索引。精确标识符、字符串和正则表达式仍使用 `dsh-tool-fs-search`（`grep`、`glob`）。
 
 ## 目录
 
@@ -75,12 +75,12 @@ kind: "package-reference"
 ##### 代码搜索指引
 
 ```markdown
-Search code by meaning with code_search before reading files: it returns the matching functions/classes with their source and their callers/callees, so you can reuse an existing implementation instead of writing a new one. Use code_related to list what calls or is called by a symbol you already know. Use grep only for exact identifiers, strings, or regular expressions.
+When you need to find where some behaviour is implemented, call code_search first, before grep, find or reading files: one call returns the matching functions/classes with their source and their callers/callees. Use code_related to list what calls or is called by a symbol you already know. Use code_outline to see the functions and classes of a file, and code_read_symbol to read one of them, instead of reading the whole file. Use grep only for exact identifiers, strings, or regular expressions.
 ```
 
 #### Token 影响
 
-工具可见时，每个请求增加一个 303 个字符（约 75 个 token）的段落。
+工具可见时，每个请求增加一个 430 个字符（约 110 个 token）的段落。
 
 #### KV 缓存影响
 
@@ -90,11 +90,11 @@ Search code by meaning with code_search before reading files: it returns the mat
 
 #### 模型看到的内容
 
-生成的 [`code_search` 与 `code_related` schema](../../../docs/tool-catalog.zh.md#deepseek-aidsh-tool-code-search)。
+生成的 [`code_search`、`code_related`、`code_outline` 与 `code_read_symbol` schema](../../../docs/tool-catalog.zh.md#deepseek-aidsh-tool-code-search)。
 
 #### Token 影响
 
-工具可见时，每个请求的固定 schema 成本为 1,384 个序列化字符（约 350 个 token）。
+工具可见时，每个请求的固定 schema 成本为 2,237 个序列化字符（约 560 个 token）。
 
 #### KV 缓存影响
 
@@ -104,7 +104,7 @@ Search code by meaning with code_search before reading files: it returns the mat
 
 #### 模型看到的内容
 
-`code_search` 为每个命中返回一个块：`[n] path:start-end kind name (language) score=s`、第一行文档，以及至多 `maxHitLines` 行源码，随后是 `Related (callers/callees/imports):` 列表。`code_related` 为每个节点返回一行。没有命中时返回一句建议使用 `grep` 或重新建立索引的话。
+`code_search` 为每个命中返回一个块：`[n] path:start-end kind name (language) score=s`、第一行文档，以及至多 `maxHitLines` 行源码，随后是 `Related (callers/callees/imports):` 列表。`code_related` 为每个节点返回一行。`code_outline` 为每个定义返回一行 `start-end kind qualified`。`code_read_symbol` 返回一行标题和带文件行号的源码，格式与 `read` 相同。没有命中时返回一句建议使用 `grep` 或重新建立索引的话。
 
 #### Token 影响
 

@@ -426,7 +426,7 @@ const TOOL_PACKAGES: ToolPackage[] = [
       await ctx.plugin(ToolCodeSearch, { command: ['senior-code-search'] })
     },
     note:
-      'code_search and code_related spawn the external senior-code-search CLI (senior-code-mcp) through ctx.subprocess as foreground calls. The index is built out of band with senior-code-ingest; shipped bundles enable the plugin only when DSH_CODE_SEARCH_COMMAND is set.',
+      'All four tools spawn the external senior-code-search CLI (senior-code-mcp) through ctx.subprocess as foreground calls. code_search and code_related read an index built out of band with senior-code-ingest; code_outline and code_read_symbol parse the file at call time. Shipped bundles enable the plugin only when DSH_CODE_SEARCH_COMMAND is set.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-terminal',

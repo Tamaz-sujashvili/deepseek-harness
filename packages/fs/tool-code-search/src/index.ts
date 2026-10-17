@@ -31,7 +31,7 @@ import z from '@deepseek-ai/schemastery'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 import type { SubprocessHandle, SubprocessOutcome, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
-import { basename } from 'node:path'
+import { basename, isAbsolute, relative, resolve, sep } from 'node:path'
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'tool-code-search'
@@ -177,6 +177,26 @@ export function buildContextArgv(input: { query: string; topK: number; hops: num
 }
 
 /**
+ * Confine a model-supplied file path to the session working directory.
+ * `code_outline` / `code_read_symbol` read files through an external
+ * process, outside the `read` tool's filesystem sandbox, so they accept only
+ * paths inside the workspace. The CLI repeats the check on the real path, so
+ * a symlink cannot leave the workspace either.
+ *
+ * @param workdir - the session working directory (the process cwd).
+ * @param path - the model-supplied path, absolute or relative to `workdir`.
+ * @returns the path relative to `workdir`.
+ * @throws {CodeSearchError} when the path is outside the workspace.
+ */
+export function workspaceRelative(workdir: string, path: string): string {
+  const rel = relative(workdir, resolve(workdir, path))
+  if (rel.length === 0 || rel === '..' || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
+    throw new CodeSearchError(`path must name a file inside the workspace: ${path}`)
+  }
+  return rel
+}
+
+/**
  * Resolve the repo filter for one call.
  *
  * @param configured - the `repo` config value.
@@ -272,6 +292,98 @@ export function parseWireNode(value: unknown): WireNode {
     end_line: optionalInt(value, 'end_line'),
     hops: requiredInt(value, 'hops'),
   }
+}
+
+/** One definition of a file outline (canonical value). */
+export interface OutlineEntry {
+  name: string
+  qualified: string
+  kind: string
+  language?: string
+  startLine: number
+  endLine: number
+}
+
+/** The exact source of one definition (canonical value). */
+export interface SymbolSource extends OutlineEntry {
+  path: string
+  source: string
+  /** Line ranges of other definitions with the same name (overload signatures, redefinitions). */
+  otherRanges?: Array<{ startLine: number; endLine: number }>
+}
+
+/**
+ * Validate one CLI outline record.
+ *
+ * @param value - one element of the CLI `outline` array.
+ * @returns the canonical outline entry.
+ * @throws {CodeSearchError} when a required field is missing or mistyped.
+ */
+export function parseOutlineEntry(value: unknown): OutlineEntry {
+  if (!isRecord(value)) throw new CodeSearchError('code search returned a non-object outline entry')
+  const language = optionalString(value, 'language')
+  return {
+    name: requiredString(value, 'name'),
+    qualified: requiredString(value, 'qualified'),
+    kind: requiredString(value, 'kind'),
+    ...language != null ? { language } : {},
+    startLine: requiredInt(value, 'start_line'),
+    endLine: requiredInt(value, 'end_line'),
+  }
+}
+
+/**
+ * Validate the CLI `symbol` document.
+ *
+ * @param value - the CLI `symbol` result.
+ * @returns the canonical symbol source.
+ * @throws {CodeSearchError} when a required field is missing or mistyped.
+ */
+export function parseSymbolSource(value: unknown): SymbolSource {
+  if (!isRecord(value)) throw new CodeSearchError('code search returned a non-object symbol')
+  const others = value['other_ranges']
+  const otherRanges = others === undefined || others === null
+    ? []
+    : expectArray(others, 'other_ranges').map((range) => {
+      if (!Array.isArray(range) || range.length !== 2 || !range.every(n => Number.isInteger(n))) {
+        throw new CodeSearchError('code search returned a malformed other_ranges entry')
+      }
+      return { startLine: range[0] as number, endLine: range[1] as number }
+    })
+  return {
+    ...parseOutlineEntry(value),
+    path: requiredString(value, 'path'),
+    source: requiredString(value, 'source'),
+    ...otherRanges.length > 0 ? { otherRanges } : {},
+  }
+}
+
+/**
+ * Model-facing outline: one `start-end kind qualified` line per definition.
+ *
+ * @param path - the file path the model asked for.
+ * @param entries - canonical outline entries in source order.
+ * @returns the text block.
+ */
+export function formatOutline(path: string, entries: readonly OutlineEntry[]): string {
+  if (entries.length === 0) return `No definitions found in ${path}.`
+  return [`${path} (${entries.length} definitions):`, ...entries.map(e => `${e.startLine}-${e.endLine} ${e.kind} ${e.qualified}`)].join('\n')
+}
+
+/**
+ * Model-facing symbol source with file line numbers, in the `read` tool layout.
+ *
+ * @param value - the canonical symbol source.
+ * @returns the text block.
+ */
+export function formatSymbol(value: SymbolSource): string {
+  const lines = value.source.replace(/\n$/, '').split('\n')
+  const width = String(value.startLine + lines.length - 1).length
+  const body = lines.map((line, i) => `${String(value.startLine + i).padStart(width)}\t${line}`)
+  const others = value.otherRanges === undefined
+    ? []
+    : [`Other definitions named ${value.qualified}: ${value.otherRanges.map(r => `${r.startLine}-${r.endLine}`).join(', ')}`]
+  return [`${value.path}:${value.startLine}-${value.endLine} ${value.kind} ${value.qualified}`, ...body, ...others].join('\n')
 }
 
 /**
@@ -452,6 +564,35 @@ const NODE_SCHEMA = {
   },
 } as const
 
+const OUTLINE_PROPERTIES = {
+  name: { type: 'string', required: true },
+  qualified: { type: 'string', required: true },
+  kind: { type: 'string', required: true },
+  language: { type: 'string' },
+  startLine: { type: 'integer', required: true },
+  endLine: { type: 'integer', required: true },
+} as const
+
+const OUTLINE_SCHEMA = { type: 'object', additionalProperties: false, properties: OUTLINE_PROPERTIES } as const
+
+const SYMBOL_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    ...OUTLINE_PROPERTIES,
+    path: { type: 'string', required: true },
+    source: { type: 'string', required: true },
+    otherRanges: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: { startLine: { type: 'integer', required: true }, endLine: { type: 'integer', required: true } },
+      },
+    },
+  },
+} as const
+
 const LANGUAGE_PARAM = {
   type: 'string',
   description: `Restrict to one language: ${CODE_SEARCH_LANGUAGES.join(', ')}.`,
@@ -481,9 +622,10 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     text: ({ scope }) => {
       if (ctx.tools.get('code_search', scope) === undefined) return ''
       const grep = ctx.tools.get('grep', scope) !== undefined
-      return 'Search code by meaning with code_search before reading files: it returns the matching functions/classes '
-        + 'with their source and their callers/callees, so you can reuse an existing implementation instead of writing a new one. '
-        + 'Use code_related to list what calls or is called by a symbol you already know.'
+      return 'When you need to find where some behaviour is implemented, call code_search first, before grep, find or reading files: '
+        + 'one call returns the matching functions/classes with their source and their callers/callees. '
+        + 'Use code_related to list what calls or is called by a symbol you already know. '
+        + 'Use code_outline to see the functions and classes of a file, and code_read_symbol to read one of them, instead of reading the whole file.'
         + (grep ? ' Use grep only for exact identifiers, strings, or regular expressions.' : '')
     },
   })
@@ -564,5 +706,47 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       return expectArray(raw, 'graph result').map(n => toNode(parseWireNode(n)))
     },
     presentCall: args => ({ card: 'generic', title: `code_related ${args.names.join(', ')}`, kind: 'search' }),
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'code_outline',
+    description: 'List the functions, classes, methods and types defined in one source file, with their line ranges. '
+      + 'Parses the file now, so the result matches the current file content.',
+    parameters: {
+      path: { type: 'string', required: true, description: 'Source file path; a relative path resolves against the workspace.' },
+    },
+    timeoutMs: resolved.timeoutMs,
+    output: {
+      schema: { type: 'array', items: OUTLINE_SCHEMA },
+      render: (args, value) => [{ type: 'text', text: formatOutline(args.path, value) }],
+    },
+    async execute(args, exec) {
+      if (args.path.trim().length === 0) throw new Error('path must be a non-empty string')
+      const raw = await runCodeSearch(ctx, exec, resolved, workdir => ['outline', `--path=${workspaceRelative(workdir, args.path)}`])
+      return expectArray(raw, 'outline').map(parseOutlineEntry)
+    },
+    presentCall: args => ({ card: 'generic', title: `code_outline ${args.path}`, kind: 'read', locations: [{ path: args.path }] }),
+  }))
+
+  ctx.tools.register(defineTool({
+    name: 'code_read_symbol',
+    description: 'Read the exact source of one function, class or method in a file, with file line numbers. '
+      + 'Accepts a qualified name from code_outline ("UserStore.save") or a plain name.',
+    parameters: {
+      path: { type: 'string', required: true, description: 'Source file path; a relative path resolves against the workspace.' },
+      name: { type: 'string', required: true, description: 'Qualified or plain definition name.' },
+    },
+    timeoutMs: resolved.timeoutMs,
+    output: {
+      schema: SYMBOL_SCHEMA,
+      render: (_args, value) => [{ type: 'text', text: formatSymbol(value) }],
+    },
+    async execute(args, exec) {
+      if (args.path.trim().length === 0) throw new Error('path must be a non-empty string')
+      if (args.name.trim().length === 0) throw new Error('name must be a non-empty string')
+      const raw = await runCodeSearch(ctx, exec, resolved, workdir => ['symbol', `--path=${workspaceRelative(workdir, args.path)}`, `--name=${args.name}`])
+      return parseSymbolSource(raw)
+    },
+    presentCall: args => ({ card: 'generic', title: `code_read_symbol ${args.path} ${args.name}`, kind: 'read', locations: [{ path: args.path }] }),
   }))
 }

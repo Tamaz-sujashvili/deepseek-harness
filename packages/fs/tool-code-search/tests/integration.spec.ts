@@ -45,5 +45,18 @@ describe.skipIf(command === undefined)('senior-code-search CLI', () => {
     })
     const nodes = JSON.parse(JSON.stringify(related.value)) as ToolCodeSearch.CodeNode[]
     expect(nodes.map(n => n.name)).toEqual(expect.arrayContaining(['Lookup', 'NewMemoryRepo']))
+
+    const fixture = process.env['DSH_CODE_SEARCH_IT_FIXTURES']
+    if (fixture !== undefined) {
+      const symbol = await ctx.tools.execute({
+        signal: new AbortController().signal,
+        callId: ToolCallId('it-3'),
+        name: 'code_read_symbol',
+        arguments: { path: `${fixture}/sample.go`, name: 'MemoryRepo.Find' },
+      })
+      expect(symbol.isError).toBe(false)
+      const value = JSON.parse(JSON.stringify(symbol.value)) as ToolCodeSearch.SymbolSource
+      expect(value.source).toContain('func (r *MemoryRepo) Find(id string)')
+    }
   }, 60_000)
 })

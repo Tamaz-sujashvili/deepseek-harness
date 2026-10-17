@@ -15,7 +15,7 @@ import { SubprocessRuntime } from '@deepseek-ai/dsh-subprocess'
 import type { SubprocessCollectedOutputs, SubprocessHandle, SubprocessOutcome, SubprocessOutputRead, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
 import * as ToolCodeSearch from '@deepseek-ai/dsh-tool-code-search'
 import { basename } from 'node:path'
-import { buildContextArgv, buildRelatedArgv, formatCodeSearch, formatNodes, parseWireChunk, parseWireNode, resolveRepo, toHit, toNode } from '@deepseek-ai/dsh-tool-code-search'
+import { buildContextArgv, buildRelatedArgv, workspaceRelative, formatCodeSearch, formatNodes, formatOutline, formatSymbol, parseOutlineEntry, parseWireChunk, parseWireNode, resolveRepo, toHit, toNode } from '@deepseek-ai/dsh-tool-code-search'
 
 const testToolSignal = new AbortController().signal
 
@@ -107,9 +107,9 @@ describe('registration', () => {
   it('registers code_search and code_related with routing guidance', async () => {
     const { ctx, subprocess } = await setup()
     expect(subprocess.spawns).toHaveLength(0)
-    expect(ctx.tools.schemas().map(s => s.name).sort()).toEqual(['code_related', 'code_search'])
+    expect(ctx.tools.schemas().map(s => s.name).sort()).toEqual(['code_outline', 'code_read_symbol', 'code_related', 'code_search'])
     const prompt = renderPrompt(await ctx.systemPrompt.assemble())
-    expect(prompt).toContain('Search code by meaning with code_search before reading files')
+    expect(prompt).toContain('call code_search first, before grep, find or reading files')
     expect(prompt).not.toContain('Use grep only for exact identifiers')
     expect(ctx.tools.get('code_search')?.timeoutMs).toBe(60_000)
   })
@@ -222,7 +222,51 @@ describe('code_related', () => {
   })
 })
 
+describe('code_outline and code_read_symbol', () => {
+  it('lists definitions of one file', async () => {
+    const { ctx, subprocess } = await setup()
+    subprocess.handler = () => ({ stdout: JSON.stringify([
+      { name: 'Store', qualified: 'Store', kind: 'class', language: 'typescript', start_line: 1, end_line: 9 },
+      { name: 'save', qualified: 'Store.save', kind: 'method', language: 'typescript', start_line: 3, end_line: 5 },
+    ]) })
+    const result = await call(ctx, 'code_outline', { path: 'src/store.ts' })
+    expect(subprocess.spawns[0]?.argv.slice(1)).toEqual(['outline', '--path=src/store.ts'])
+    expect(text(result)).toBe('src/store.ts (2 definitions):\n1-9 class Store\n3-5 method Store.save')
+  })
+
+  it('returns numbered symbol source', async () => {
+    const { ctx, subprocess } = await setup()
+    subprocess.handler = () => ({ stdout: JSON.stringify({
+      path: 'src/store.ts', name: 'save', qualified: 'Store.save', kind: 'method', language: 'typescript',
+      start_line: 9, end_line: 11, source: '  save() {\n    return 1\n  }\n',
+    }) })
+    const result = await call(ctx, 'code_read_symbol', { path: 'src/store.ts', name: '--Store.save' })
+    expect(subprocess.spawns[0]?.argv.slice(1)).toEqual(['symbol', '--path=src/store.ts', '--name=--Store.save'])
+    expect(text(result)).toBe('src/store.ts:9-11 method Store.save\n 9\t  save() {\n10\t    return 1\n11\t  }')
+    subprocess.handler = () => ({ stdout: JSON.stringify({
+      path: 'a.ts', name: 'foo', qualified: 'A.foo', kind: 'method', start_line: 4, end_line: 4, source: 'foo(x) {}', other_ranges: [[2, 2], [3, 3]],
+    }) })
+    expect(text(await call(ctx, 'code_read_symbol', { path: 'a.ts', name: 'A.foo' }))).toBe('a.ts:4-4 method A.foo\n4\tfoo(x) {}\nOther definitions named A.foo: 2-2, 3-3')
+  })
+
+  it('reports an unknown symbol from the CLI error document', async () => {
+    const { ctx, subprocess } = await setup()
+    subprocess.handler = () => ({ stdout: JSON.stringify({ error: "LookupError: no definition named 'x' in a.py; known: f" }), exitCode: 2 })
+    expect(text(await call(ctx, 'code_read_symbol', { path: 'a.py', name: 'x' }))).toContain('known: f')
+    expect((await call(ctx, 'code_outline', { path: ' ' })).isError).toBe(true)
+  })
+})
+
 describe('pure helpers', () => {
+  it('confines outline/symbol paths to the workspace', () => {
+    expect(workspaceRelative('/work/app', 'src/a.ts')).toBe('src/a.ts')
+    expect(workspaceRelative('/work/app', '/work/app/src/a.ts')).toBe('src/a.ts')
+    expect(() => workspaceRelative('/work/app', '../other/a.ts')).toThrow(/inside the workspace/)
+    expect(() => workspaceRelative('/work/app', '/etc/passwd')).toThrow(/inside the workspace/)
+    expect(() => workspaceRelative('/work/app', '.')).toThrow(/inside the workspace/)
+    expect(workspaceRelative('/work/app', '..foo/a.ts')).toBe('..foo/a.ts')
+  })
+
   it('resolves the repo filter from config or the working directory', () => {
     expect(resolveRepo(undefined, '/work/my-app')).toBe('my-app')
     expect(resolveRepo('other', '/work/my-app')).toBe('other')
@@ -248,5 +292,9 @@ describe('pure helpers', () => {
     const out = formatCodeSearch({ hits: [{ path: 'a.py', name: 'f', kind: 'function', startLine: 1, endLine: 1, score: 1, source }], related: [] }, 3)
     expect(out).toBe('[1] a.py:1 function f score=1\nline 0\nline 1\nline 2\n… (47 more lines; use read for the rest)')
     expect(formatNodes([])).toBe('No graph neighbours found for these names.')
+    expect(formatOutline('a.py', [])).toBe('No definitions found in a.py.')
+    expect(() => parseOutlineEntry({ name: 'f' })).toThrow(/without qualified/)
+    expect(formatSymbol({ path: 'a.py', name: 'f', qualified: 'f', kind: 'function', startLine: 1, endLine: 1, source: 'def f(): pass' }))
+      .toBe('a.py:1-1 function f\n1\tdef f(): pass')
   })
 })

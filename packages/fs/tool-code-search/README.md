@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-Use `dsh-tool-code-search` to give models semantic and structural code search over a [senior-code-mcp](https://github.com/Tamaz-sujashvili/senior-code-mcp) index. `code_search` returns the functions, classes and methods that match a natural-language or code query, with their source and their graph neighbours. `code_related` returns the callers, callees and imports of named symbols. Keep `dsh-tool-fs-search` (`grep`, `glob`) for exact identifiers, strings and regular expressions.
+Use `dsh-tool-code-search` to give models semantic and structural code search over a [senior-code-mcp](https://github.com/Tamaz-sujashvili/senior-code-mcp) index. `code_search` returns the functions, classes and methods that match a natural-language or code query, with their source and their graph neighbours. `code_related` returns the callers, callees and imports of named symbols. `code_outline` lists the definitions of one file with line ranges, and `code_read_symbol` returns the exact source of one definition; both parse the file at call time and need no index. Keep `dsh-tool-fs-search` (`grep`, `glob`) for exact identifiers, strings and regular expressions.
 
 ## Table of Contents
 
@@ -75,12 +75,12 @@ The section renders only while `code_search` is visible. The last sentence rende
 ##### Code search guidance
 
 ```markdown
-Search code by meaning with code_search before reading files: it returns the matching functions/classes with their source and their callers/callees, so you can reuse an existing implementation instead of writing a new one. Use code_related to list what calls or is called by a symbol you already know. Use grep only for exact identifiers, strings, or regular expressions.
+When you need to find where some behaviour is implemented, call code_search first, before grep, find or reading files: one call returns the matching functions/classes with their source and their callers/callees. Use code_related to list what calls or is called by a symbol you already know. Use code_outline to see the functions and classes of a file, and code_read_symbol to read one of them, instead of reading the whole file. Use grep only for exact identifiers, strings, or regular expressions.
 ```
 
 #### Token effect
 
-One section of 303 characters (approximately 75 tokens) on every request where the tool is visible.
+One section of 430 characters (approximately 110 tokens) on every request where the tool is visible.
 
 #### KV Cache effect
 
@@ -90,11 +90,11 @@ Prefix-stable while the visible tool set is unchanged.
 
 #### What the model sees
 
-The generated [`code_search` and `code_related` schemas](../../../docs/tool-catalog.md#deepseek-aidsh-tool-code-search).
+The generated [`code_search`, `code_related`, `code_outline` and `code_read_symbol` schemas](../../../docs/tool-catalog.md#deepseek-aidsh-tool-code-search).
 
 #### Token effect
 
-Fixed schema cost of 1,384 serialized characters (approximately 350 tokens) on every request where the tools are visible.
+Fixed schema cost of 2,237 serialized characters (approximately 560 tokens) on every request where the tools are visible.
 
 #### KV Cache effect
 
@@ -104,7 +104,7 @@ Prefix-stable while tool visibility and definitions are unchanged.
 
 #### What the model sees
 
-`code_search` returns one block for each hit: `[n] path:start-end kind name (language) score=s`, the first doc line, and at most `maxHitLines` source lines, then a `Related (callers/callees/imports):` list. `code_related` returns one line for each node. Zero hits return a sentence that recommends `grep` or a new index.
+`code_search` returns one block for each hit: `[n] path:start-end kind name (language) score=s`, the first doc line, and at most `maxHitLines` source lines, then a `Related (callers/callees/imports):` list. `code_related` returns one line for each node. `code_outline` returns one `start-end kind qualified` line for each definition. `code_read_symbol` returns a header line and the source with file line numbers, in the `read` layout. Zero hits return a sentence that recommends `grep` or a new index.
 
 #### Token effect
 
