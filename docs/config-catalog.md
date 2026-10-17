@@ -3541,7 +3541,7 @@ export interface Config {
 
 ## `@deepseek-ai/dsh-system-prompt`
 
-- `source`: [`packages/core/system-prompt/src/index.ts:258`](../packages/core/system-prompt/src/index.ts)
+- `source`: [`packages/core/system-prompt/src/index.ts:259`](../packages/core/system-prompt/src/index.ts)
 
 ```ts config-catalog
 /** Plugin config: the deployment-authored fragment of the system prompt (see {@link Config.personaPrefix} for its contract). */
@@ -3751,6 +3751,41 @@ export interface Config {
 }
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-tool-bash-persistent -->
+
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-tool-code-search -->
+<a id="deepseek-aidsh-tool-code-search"></a>
+
+## `@deepseek-ai/dsh-tool-code-search`
+
+- `inject`: `tools` · `systemPrompt` · `subprocess` · `workingDirectory`
+- `source`: [`packages/fs/tool-code-search/src/index.ts:52`](../packages/fs/tool-code-search/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `tool-code-search` (`cordis.yml` `config:`). */
+export interface Config {
+  /**
+   * Ingested repo name whose hits `code_search` returns. Unset: the base name
+   * of the session working directory, which is the name `senior-code-ingest`
+   * records for that directory. `'*'`: hits from every ingested repo.
+   */
+  repo?: string
+  /** argv prefix of the senior-code-search CLI, e.g. `['/path/.venv/bin/senior-code-search']`. */
+  command: string[]
+  /** Extra environment for the CLI (QDRANT_URL, QDRANT_COLLECTION, GRAPH_PATH, OLLAMA_URL, ...). */
+  env?: Record<string, string>
+  /** Default semantic hits per call. */
+  topK?: number
+  /** Max source lines per hit in the model-facing text. */
+  maxHitLines?: number
+  /** Max raw CLI stdout bytes parsed. */
+  rawOutputMaxBytes?: number
+  /** Cooperative tool-call timeout (ms). Embedding a query on a cold Ollama can take seconds. */
+  timeoutMs?: number
+  /** Terminate-escalation grace (ms). */
+  graceMs?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-tool-code-search -->
 
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-tool-fs -->
 <a id="deepseek-aidsh-tool-fs"></a>

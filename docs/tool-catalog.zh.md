@@ -35,6 +35,7 @@
 | `@deepseek-ai/dsh-tool-str-replace-editor` | `str_replace_editor` | `ctx.tools`、`ctx.fs` | `tool/call`、`fs/observed after view presence/absence, edit absence, or successful mutation`、`tool/result` | - | 基于文件系统 seam 的独立查看／创建／唯一字面量替换／按行插入工具；可与任何 shell 或终端接口组合。 |
 | `@deepseek-ai/dsh-tool-fs` | `edit`、`read`、`read_image`、`write` | `ctx.workingDirectory`、`ctx.tools`、`ctx.fs`、`ctx.systemPrompt`、`ctx.attachments (image-tool registration)`、`ctx.llm + an image-capable route (image-tool execution)` | `tool/call`、`fs/write-intent or fs/edit-intent for mutations`、`fs/observed after read presence/absence or successful file operation`、`durable attachment (read_image)`、`tool/result` | - | 先读后写／编辑策略由 `@deepseek-ai/dsh-fs-observation-policy` 添加；它是一个 `fs/*` 事件门禁插件，不会改变 schema。加载这些工具的部署按预期也应加载该插件。没有 `ctx.attachments` 时图片工具不会注册；其 schema 与路由无关，执行时除非确切路由的模型声明图片输入，否则拒绝。 |
 | `@deepseek-ai/dsh-tool-fs-search` | `glob`、`grep` | `ctx.workingDirectory`、`ctx.tools`、`ctx.subprocess`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | glob 和 grep 是无条件可用的发现工具，通过 ctx.subprocess spawn 随包提供的 ripgrep 二进制文件（`@vscode/ripgrep`），并作为普通前台调用运行，绝不作为后台任务；无需在宿主机安装 `rg`，也不经过 shell 层。本目录使用 `sampleOverCapGlobResults: true`；部署必须显式选择该行为。结果超过上限时，会通过可选的 ctx.spillStore 后端保存完整的格式化列表；在共置部署中，如果后端公开本地路径，返回的定位信息可供后续读取／搜索。 |
+| `@deepseek-ai/dsh-tool-code-search` | `code_related`、`code_search` | `ctx.workingDirectory`、`ctx.tools`、`ctx.subprocess`、`ctx.systemPrompt` | `tool/call`、`tool/result` | - | code_search 和 code_related 通过 ctx.subprocess 以前台调用方式 spawn 外部 senior-code-search CLI（senior-code-mcp）。索引由 senior-code-ingest 在带外构建；随附的 bundle 仅在设置 DSH_CODE_SEARCH_COMMAND 时启用该插件。 |
 | `@deepseek-ai/dsh-tool-terminal` | `terminal_close`、`terminal_list`、`terminal_open`、`terminal_read`、`terminal_send`、`terminal_signal` | `ctx.workingDirectory`、`ctx.tools`、`ctx.terminals`、`ctx.systemPrompt`、`ctx.jobs at call time for run_in_background` | `tool/call`、`tool/result` | - | 这 6 个终端工具需要选择启用，用于补充一次性 bash／文件系统工具。`terminal_send(run_in_background: true)` 会注册到 `ctx.jobs`；schema 不包含 TUI、具名按键序列、BEL、调整尺寸、自动启动和跨 agent 共享。 |
 | `@deepseek-ai/dsh-tool-goal` | `create_goal`、`get_goal`、`update_goal` | `ctx.tools`、`ctx.agents`、`ctx.goals`、`ctx.systemPrompt`、`a calling Agent in an authorized open turn` | `tool/call`、`goal/change for mutations`、`tool/result` | - | create、edit、pause 和 resume 要求直接来自人类的根权限；complete 和 blocked 也接受确切的当前 Goal Round。blocked 的默认下限是 3 个获准的 Round。 |
 | `@deepseek-ai/dsh-tool-schedule` | `schedule_create`、`schedule_delete`、`schedule_list`、`schedule_update` | `ctx.tools`、`ctx.schedule` | `tool/call`、Schedule storage domain 创建、更新或删除、`tool/result` | - | preset 或 Agent scope 挂载本包；由 preset 决定哪些 agent 获得这四个管理工具。每次调用都作用于调用方 Agent 的 Session。接受 after_seconds、显式绝对 at、有界固定速率 every_seconds、带显式 IANA 时区的每日与每周本地时间，以及作为五字段表达式的 cron。管理使用宿主 storage domain；到期消息会恢复原 Session。 |
@@ -1176,6 +1177,77 @@ pwsh 工具是 Windows 组合中 bash 执行器 seam 的 PowerShell 方言消费
 来源：[`packages/fs/tool-fs-search/src/index.ts`](../packages/fs/tool-fs-search/src/index.ts)
 
 glob 和 grep 是无条件可用的发现工具，通过 ctx.subprocess spawn 随包提供的 ripgrep 二进制文件（`@vscode/ripgrep`），并作为普通前台调用运行，绝不作为后台任务；无需在宿主机安装 `rg`，也不经过 shell 层。本目录使用 `sampleOverCapGlobResults: true`；部署必须显式选择该行为。结果超过上限时，会通过可选的 ctx.spillStore 后端保存完整的格式化列表；在共置部署中，如果后端公开本地路径，返回的定位信息可供后续读取／搜索。
+
+<a id="deepseek-aidsh-tool-code-search"></a>
+
+## `@deepseek-ai/dsh-tool-code-search`
+
+### `code_related`
+
+结构化代码搜索：从调用／导入图中列出指定符号的调用方、被调用方和导入。接受简单名称（"save"）或限定名称（"UserStore.save"）。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "names": {
+      "type": "array",
+      "description": "Symbol names to start from.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "hops": {
+      "type": "integer",
+      "description": "Graph hops (1-3, default 1)."
+    },
+    "language": {
+      "type": "string",
+      "description": "Restrict to one language: python, javascript, typescript, tsx, go, rust, java."
+    }
+  },
+  "required": [
+    "names"
+  ]
+}
+```
+
+来源：[`packages/fs/tool-code-search/src/index.ts`](../packages/fs/tool-code-search/src/index.ts)
+
+### `code_search`
+
+在已建立索引的仓库上进行语义 + 结构化代码搜索。将自然语言或代码查询转为嵌入向量，返回最匹配的函数／类／方法（路径、行号、文档字符串、源码）及其图邻居（调用方、被调用方、导入）。对于“X 在哪里实现”这类问题，优先使用它而不是 grep。
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "What the code does, in words or as a code fragment."
+    },
+    "language": {
+      "type": "string",
+      "description": "Restrict to one language: python, javascript, typescript, tsx, go, rust, java."
+    },
+    "top_k": {
+      "type": "integer",
+      "description": "Number of hits (1-20, default 5)."
+    },
+    "hops": {
+      "type": "integer",
+      "description": "Graph hops around the hits (0-2, default 1). 0 = no neighbours."
+    }
+  },
+  "required": [
+    "query"
+  ]
+}
+```
+
+来源：[`packages/fs/tool-code-search/src/index.ts`](../packages/fs/tool-code-search/src/index.ts)
+
+code_search 和 code_related 通过 ctx.subprocess 以前台调用方式 spawn 外部 senior-code-search CLI（senior-code-mcp）。索引由 senior-code-ingest 在带外构建；随附的 bundle 仅在设置 DSH_CODE_SEARCH_COMMAND 时启用该插件。
 
 <a id="deepseek-aidsh-experimental-tool-terminal"></a>
 

@@ -23,7 +23,7 @@ describe.skipIf(command === undefined)('senior-code-search CLI', () => {
     await ctx.plugin(SystemPrompt)
     await ctx.plugin(ToolRuntime)
     await ctx.plugin(LocalSubprocessRuntime)
-    await ctx.plugin(ToolCodeSearch, { command: [command!], env: { ...process.env } as Record<string, string> })
+    await ctx.plugin(ToolCodeSearch, { command: [command!], repo: 'polyglot', env: { ...process.env } as Record<string, string> })
 
     const search = await ctx.tools.execute({
       signal: new AbortController().signal,

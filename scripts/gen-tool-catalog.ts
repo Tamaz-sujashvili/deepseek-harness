@@ -52,6 +52,7 @@ import * as ToolCordis from '@deepseek-ai/dsh-tool-cordis'
 import * as ToolPresent from '@deepseek-ai/dsh-tool-present'
 import * as ToolFs from '@deepseek-ai/dsh-tool-fs'
 import * as ToolFsSearch from '@deepseek-ai/dsh-tool-fs-search'
+import * as ToolCodeSearch from '@deepseek-ai/dsh-tool-code-search'
 import * as ToolStrReplaceEditor from '@deepseek-ai/dsh-tool-str-replace-editor'
 import TerminalSessionService from '@deepseek-ai/dsh-terminal'
 import * as ToolPty from '@deepseek-ai/dsh-tool-terminal'
@@ -412,6 +413,20 @@ const TOOL_PACKAGES: ToolPackage[] = [
     },
     note:
       'glob and grep are unconditional discovery tools that spawn the packaged ripgrep binary (`@vscode/ripgrep`) through ctx.subprocess as ordinary foreground calls (never background jobs) — no host `rg` install and no shell layer. The catalog uses `sampleOverCapGlobResults: true`; deployments must choose that behavior explicitly. Capped results save the complete formatted list through the optional ctx.spillStore backend; returned locators are follow-up-readable/searchable when the backend exposes local paths in co-located deployments.',
+  },
+  {
+    pkg: '@deepseek-ai/dsh-tool-code-search',
+    dir: 'tool-code-search',
+    source: 'packages/fs/tool-code-search/src/index.ts',
+    requires: ['ctx.workingDirectory', 'ctx.tools', 'ctx.subprocess', 'ctx.systemPrompt'],
+    writes: ['tool/call', 'tool/result'],
+    async mount(ctx) {
+      // Registration never spawns; the CLI path is only used at call time.
+      await ctx.plugin(LocalSubprocessRuntime)
+      await ctx.plugin(ToolCodeSearch, { command: ['senior-code-search'] })
+    },
+    note:
+      'code_search and code_related spawn the external senior-code-search CLI (senior-code-mcp) through ctx.subprocess as foreground calls. The index is built out of band with senior-code-ingest; shipped bundles enable the plugin only when DSH_CODE_SEARCH_COMMAND is set.',
   },
   {
     pkg: '@deepseek-ai/dsh-tool-terminal',

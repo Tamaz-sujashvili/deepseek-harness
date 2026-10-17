@@ -31,6 +31,7 @@ import z from '@deepseek-ai/schemastery'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type { ToolExecution } from '@deepseek-ai/dsh-tools'
 import type { SubprocessHandle, SubprocessOutcome, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
+import { basename } from 'node:path'
 
 /** Cordis plugin name used by loader diagnostics. */
 export const name = 'tool-code-search'
@@ -47,7 +48,14 @@ export const CODE_SEARCH_TOP_K = 5
 /** Max lines of source kept per hit in the model-facing text. */
 export const CODE_SEARCH_MAX_HIT_LINES = 40
 
+/** Plugin configuration for `tool-code-search` (`cordis.yml` `config:`). */
 export interface Config {
+  /**
+   * Ingested repo name whose hits `code_search` returns. Unset: the base name
+   * of the session working directory, which is the name `senior-code-ingest`
+   * records for that directory. `'*'`: hits from every ingested repo.
+   */
+  repo?: string
   /** argv prefix of the senior-code-search CLI, e.g. `['/path/.venv/bin/senior-code-search']`. */
   command: string[]
   /** Extra environment for the CLI (QDRANT_URL, QDRANT_COLLECTION, GRAPH_PATH, OLLAMA_URL, ...). */
@@ -65,6 +73,7 @@ export interface Config {
 }
 
 export const Config: z<Config> = z.object({
+  repo: z.string(),
   command: z.array(z.string()).required(),
   env: z.dict(z.string()),
   topK: z.number().default(CODE_SEARCH_TOP_K),
@@ -75,7 +84,7 @@ export const Config: z<Config> = z.object({
 })
 
 /** Plugin config after schemastery defaulting. */
-export type ResolvedConfig = Required<Omit<Config, 'env'>> & Pick<Config, 'env'>
+export type ResolvedConfig = Required<Omit<Config, 'env' | 'repo'>> & Pick<Config, 'env' | 'repo'>
 
 /** One semantic hit, as the CLI returns it (snake_case wire names). */
 export interface WireChunk {
@@ -153,18 +162,30 @@ function boundedInt(field: string, value: number | undefined, fallback: number, 
 }
 
 /**
- * Build the CLI argv tail for one call. Every model-controlled value is its
- * own argv element in `--flag=value` form, so a leading-dash query can never
- * be parsed as a flag.
- */
-/**
- * @param input - validated `code_search` arguments after defaulting.
+ * Build the CLI argv tail for one `code_search` call. Every model-controlled
+ * value is its own argv element in `--flag=value` form, so a leading-dash
+ * query can never be parsed as a flag.
+ *
+ * @param input - validated `code_search` arguments after defaulting; `repo` undefined searches every repo.
  * @returns the CLI argv tail (after the configured command).
  */
-export function buildContextArgv(input: { query: string; topK: number; hops: number; language?: string }): string[] {
+export function buildContextArgv(input: { query: string; topK: number; hops: number; language?: string; repo?: string }): string[] {
   const argv = ['context', `--query=${input.query}`, `--top-k=${input.topK}`, `--hops=${input.hops}`]
   if (input.language !== undefined) argv.push(`--language=${input.language}`)
+  if (input.repo !== undefined) argv.push(`--repo=${input.repo}`)
   return argv
+}
+
+/**
+ * Resolve the repo filter for one call.
+ *
+ * @param configured - the `repo` config value.
+ * @param workdir - the session working directory.
+ * @returns the repo name to filter on, or undefined for every repo (`'*'`).
+ */
+export function resolveRepo(configured: string | undefined, workdir: string): string | undefined {
+  if (configured === '*') return undefined
+  return configured ?? basename(workdir)
 }
 
 /**
@@ -340,13 +361,19 @@ export function formatNodes(nodes: readonly CodeNode[]): string {
  * @param ctx - plugin context providing `subprocess` and `workingDirectory`.
  * @param exec - the tool execution; its signal cancels the process.
  * @param config - resolved plugin config.
- * @param argv - CLI argv tail from {@link buildContextArgv} / {@link buildRelatedArgv}.
+ * @param argvFor - builds the CLI argv tail ({@link buildContextArgv} / {@link buildRelatedArgv}) for the resolved working directory.
  * @returns the parsed JSON document.
  * @throws {CodeSearchError} on spawn failure, abort, non-zero exit, or non-JSON output.
  */
-export async function runCodeSearch(ctx: Context, exec: ToolExecution, config: ResolvedConfig, argv: readonly string[]): Promise<unknown> {
+export async function runCodeSearch(
+  ctx: Context,
+  exec: ToolExecution,
+  config: ResolvedConfig,
+  argvFor: (workdir: string) => readonly string[],
+): Promise<unknown> {
   if (exec.signal.aborted) throw new CodeSearchError('code search was aborted before completion')
   const workdir = exec.agent === undefined ? process.cwd() : await ctx.workingDirectory.ensure(exec.agent, exec.signal)
+  const argv = argvFor(workdir)
   let handle: SubprocessHandle
   try {
     handle = ctx.subprocess.spawn({
@@ -490,12 +517,16 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       const topK = boundedInt('top_k', args.top_k, resolved.topK, 20)
       if (topK === 0) throw new Error('top_k must be at least 1')
       const hops = boundedInt('hops', args.hops, 1, 2)
-      const raw = await runCodeSearch(ctx, exec, resolved, buildContextArgv({
-        query: args.query,
-        topK,
-        hops,
-        ...args.language !== undefined ? { language: args.language } : {},
-      }))
+      const raw = await runCodeSearch(ctx, exec, resolved, (workdir) => {
+        const repo = resolveRepo(resolved.repo, workdir)
+        return buildContextArgv({
+          query: args.query,
+          topK,
+          hops,
+          ...args.language !== undefined ? { language: args.language } : {},
+          ...repo !== undefined ? { repo } : {},
+        })
+      })
       if (!isRecord(raw)) throw new CodeSearchError('code search returned a non-object context result')
       return {
         hits: expectArray(raw['similar_chunks'], 'similar_chunks').map(c => toHit(parseWireChunk(c))),
@@ -525,7 +556,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
       validateLanguage(args.language)
       const hops = boundedInt('hops', args.hops, 1, 3)
       if (hops === 0) throw new Error('hops must be at least 1')
-      const raw = await runCodeSearch(ctx, exec, resolved, buildRelatedArgv({
+      const raw = await runCodeSearch(ctx, exec, resolved, () => buildRelatedArgv({
         names,
         hops,
         ...args.language !== undefined ? { language: args.language } : {},

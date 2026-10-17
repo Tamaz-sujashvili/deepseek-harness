@@ -14,7 +14,8 @@ import ToolRuntime from '@deepseek-ai/dsh-tools'
 import { SubprocessRuntime } from '@deepseek-ai/dsh-subprocess'
 import type { SubprocessCollectedOutputs, SubprocessHandle, SubprocessOutcome, SubprocessOutputRead, SubprocessSpawnSpec } from '@deepseek-ai/dsh-subprocess'
 import * as ToolCodeSearch from '@deepseek-ai/dsh-tool-code-search'
-import { buildContextArgv, buildRelatedArgv, formatCodeSearch, formatNodes, parseWireChunk, parseWireNode, toHit, toNode } from '@deepseek-ai/dsh-tool-code-search'
+import { basename } from 'node:path'
+import { buildContextArgv, buildRelatedArgv, formatCodeSearch, formatNodes, parseWireChunk, parseWireNode, resolveRepo, toHit, toNode } from '@deepseek-ai/dsh-tool-code-search'
 
 const testToolSignal = new AbortController().signal
 
@@ -139,6 +140,7 @@ describe('code_search', () => {
     expect(result.isError).toBe(false)
     expect(subprocess.spawns[0]?.argv).toEqual([
       '/opt/scm/bin/senior-code-search', 'context', '--query=--find user', '--top-k=3', '--hops=1', '--language=typescript',
+      `--repo=${basename(subprocess.spawns[0]?.cwd ?? '')}`,
     ])
     expect(subprocess.spawns[0]?.env).toEqual({ QDRANT_COLLECTION: 'code_chunks' })
     expect(result.value).toEqual({
@@ -221,6 +223,12 @@ describe('code_related', () => {
 })
 
 describe('pure helpers', () => {
+  it('resolves the repo filter from config or the working directory', () => {
+    expect(resolveRepo(undefined, '/work/my-app')).toBe('my-app')
+    expect(resolveRepo('other', '/work/my-app')).toBe('other')
+    expect(resolveRepo('*', '/work/my-app')).toBeUndefined()
+  })
+
   it('builds argv without the optional language', () => {
     expect(buildContextArgv({ query: 'q', topK: 5, hops: 0 })).toEqual(['context', '--query=q', '--top-k=5', '--hops=0'])
     expect(buildRelatedArgv({ names: ['a'], hops: 1, language: 'go' })).toEqual(['related', '--name=a', '--hops=1', '--language=go'])
