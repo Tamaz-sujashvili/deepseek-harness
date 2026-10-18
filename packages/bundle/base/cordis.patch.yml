@@ -473,6 +473,18 @@
         thresholds: [3, 5, 8]
         argumentsPreviewChars: 500
 
+    # Advisory notes on shell results: repeated error lines, non-fail-fast or
+    # help-only checks, long foreground runs. Off unless DSH_EXECUTION_RISK_HINTS is set.
+    - id: execution-risk-hints
+      name: '@deepseek-ai/dsh-execution-risk-hints'
+      disabled: !!js '!process.env.DSH_EXECUTION_RISK_HINTS'
+
+    # One steered continuation when a turn ends with edits that no passing
+    # check covers. Off unless DSH_VERIFY_BEFORE_FINISH is set.
+    - id: verify-before-finish
+      name: '@deepseek-ai/dsh-verify-before-finish'
+      disabled: !!js '!process.env.DSH_VERIFY_BEFORE_FINISH'
+
     # The shared base enables the stable model-facing web_search and web_fetch
     # tools. The Web app disables this host row and composes both tools per agent
     # preset; products with a stricter network policy override tool-web. DeepSeek

@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-The `guard/` group keeps the agent loop productive by watching for two common failure patterns. `repeat-tool-reminder` notices when the model repeats the exact same tool call and reminds it to change approach or finish, so a stuck loop stops burning time and tokens. `timeout-policy` puts a time limit on tool calls that declare one, so a hung call returns a clear timed-out error to the model instead of stalling the session. Both ship enabled in the `dsh` base bundle; a composition can tune or remove them.
+The `guard/` group keeps the agent loop productive by watching for two common failure patterns. `repeat-tool-reminder` notices when the model repeats the exact same tool call and reminds it to change approach or finish, so a stuck loop stops burning time and tokens. `timeout-policy` puts a time limit on tool calls that declare one, so a hung call returns a clear timed-out error to the model instead of stalling the session. Both ship enabled in the `dsh` base bundle; a composition can tune or remove them. Two opt-in plugins add execution feedback.
 
 ## Table of Contents
 
@@ -22,12 +22,14 @@ The `guard/` group keeps the agent loop productive by watching for two common fa
 <a id="packages"></a>
 ## Packages
 
-Two small plugins cover the two patterns; each README below explains when to keep, tune, or remove it.
+Two small plugins cover the two patterns, and two opt-in plugins add execution feedback; each README below explains when to keep, tune, or remove it.
 
 | Package | What it provides |
 |---|---|
 | [`repeat-tool-reminder/`](repeat-tool-reminder/README.md) | Reminds the model when it repeats the same tool call, so it changes approach or finishes |
 | [`timeout-policy/`](timeout-policy/README.md) | Times out tool calls that declare a limit, so the model gets a clear error instead of waiting forever |
+| [`execution-risk-hints/`](execution-risk-hints/README.md) | Opt-in notes on shell results: repeated error lines, weak checks, long foreground runs |
+| [`verify-before-finish/`](verify-before-finish/README.md) | Opt-in turn-stop gate: one more step when edits have no passing check after them |
 
 -----
 

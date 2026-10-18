@@ -884,6 +884,35 @@ export type GrammarName = 'python' | 'javascript' | 'typescript' | 'tsx' | 'go' 
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-edit-syntax-guard -->
 
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-execution-risk-hints -->
+<a id="deepseek-aidsh-execution-risk-hints"></a>
+
+## `@deepseek-ai/dsh-execution-risk-hints`
+
+- `source`: [`packages/guard/execution-risk-hints/src/index.ts:32`](../packages/guard/execution-risk-hints/src/index.ts)
+
+```ts config-catalog
+/** Plugin config; out-of-range numbers and unknown detector keys fail the plugin load. */
+export interface Config {
+  /** Tools whose `command` argument is a shell command line (default `bash`). */
+  shellTools?: string[]
+  /** Detectors to run (default: all four). */
+  detectors?: RiskKey[]
+  /** Consecutive failing shell results with the same error line that trigger `repeated-error` (default 2). */
+  errorRepeatThreshold?: number
+  /** Foreground duration in milliseconds from which a shell call counts as long (default 120000). */
+  longStepMs?: number
+  /** Total long-call time in milliseconds that triggers `time-budget` without a timeout (default 420000). */
+  budgetMs?: number
+  /** Maximum notes attached to one tool result (default 2). */
+  maxNotesPerCall?: number
+}
+
+/** Detector keys, in the order the README documents them. */
+export type RiskKey = 'repeated-error' | 'time-budget' | 'non-fail-fast-check' | 'shallow-check'
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-execution-risk-hints -->
+
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-experimental-agent-team -->
 <a id="deepseek-aidsh-experimental-agent-team"></a>
 
@@ -4384,6 +4413,38 @@ export interface Config {
 export type ApprovalPolicy = 'ask' | 'never'
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-user-approval -->
+
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-verify-before-finish -->
+<a id="deepseek-aidsh-verify-before-finish"></a>
+
+## `@deepseek-ai/dsh-verify-before-finish`
+
+- `source`: [`packages/guard/verify-before-finish/src/index.ts:30`](../packages/guard/verify-before-finish/src/index.ts)
+
+```ts config-catalog
+/**
+ * Plugin config. Pattern lists are JavaScript regular-expression sources,
+ * compiled case-insensitively at load; an invalid source or an out-of-range
+ * number fails the plugin load.
+ */
+export interface Config {
+  /** Tools whose successful calls count as file edits (default `edit`, `write`, `str_replace_editor`). */
+  editTools?: string[]
+  /** Values of an edit tool's `command` argument that do not change files (default `view`). */
+  readOnlyCommands?: string[]
+  /** Tools whose `command` argument is a shell command line (default `bash`). */
+  shellTools?: string[]
+  /** Shell command patterns that count as a verification run (test runners and script runs by default). */
+  verifyPatterns?: string[]
+  /** Shell command patterns that count as a file edit (in-place editors, redirects into source files, patches). */
+  shellEditPatterns?: string[]
+  /** Maximum steered continuations for one user message (default 1). */
+  maxHoldsPerPrompt?: number
+  /** Maximum edited paths named in the steering message (default 8). */
+  maxListedPaths?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-verify-before-finish -->
 
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-web -->
 <a id="deepseek-aidsh-web"></a>

@@ -1,0 +1,55 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/guard/execution-risk-hints/README.md
+/:
+  en: 55267b3cda0cb55a
+  zh: e58af48a842403f3
+/deepseek-ai-dsh-execution-risk-hints:
+  en: 44ff886102ac3942
+  zh: 7cd431955048a19c
+/deepseek-ai-dsh-execution-risk-hints/summary:
+  en: 0be1c2e4ca7a4975
+  zh: 61511c455291df18
+/deepseek-ai-dsh-execution-risk-hints/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-execution-risk-hints/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-execution-risk-hints/use-this-package/setup:
+  en: 1192e8ae117edab9
+  zh: 30fc77517811937e
+/deepseek-ai-dsh-execution-risk-hints/use-this-package/configuration:
+  en: 8e26107d08fcaf69
+  zh: 28970d0874624d70
+/deepseek-ai-dsh-execution-risk-hints/understand-the-implementation:
+  en: 3e218934fc8ffc55
+  zh: 5e8ee3ea663f80f9
+/deepseek-ai-dsh-execution-risk-hints/further-exploration:
+  en: 88dee64151e0f338
+  zh: a6eb5977de8d6b48
+/deepseek-ai-dsh-execution-risk-hints/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-execution-risk-hints/model-experience/execution-notes:
+  en: d0f019f2fd175639
+  zh: c839d1e8c1d79d48
+/deepseek-ai-dsh-execution-risk-hints/model-experience/execution-notes/what-the-model-sees:
+  en: 0bb5c6cad7491608
+  zh: 464d9873801213b9
+/deepseek-ai-dsh-execution-risk-hints/model-experience/execution-notes/what-the-model-sees/repeated-error-note:
+  en: ec8b6b236481abae
+  zh: 25d46267fb26253c
+/deepseek-ai-dsh-execution-risk-hints/model-experience/execution-notes/token-effect:
+  en: e0c5813c0648c82a
+  zh: cfdba8424d612854
+/deepseek-ai-dsh-execution-risk-hints/model-experience/execution-notes/kv-cache-effect:
+  en: 2fd91f6c2e2216da
+  zh: 477e8d8f35bde8cd
+/deepseek-ai-dsh-execution-risk-hints/known-limitations-and-deferred-work:
+  en: 1a150b4fbbd0eac2
+  zh: 81f5497e6ded912a
+/deepseek-ai-dsh-execution-risk-hints/known-limitations-and-deferred-work/dev-note:
+  en: 9c2ca9a64452af01
+  zh: d64ee126b160379a

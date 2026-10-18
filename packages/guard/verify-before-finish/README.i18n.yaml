@@ -1,0 +1,58 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/guard/verify-before-finish/README.md
+/:
+  en: dfb523cf83e4f0b9
+  zh: 5c515d5a45490c96
+/deepseek-ai-dsh-verify-before-finish:
+  en: 4c9431e306c10411
+  zh: 4721995986259843
+/deepseek-ai-dsh-verify-before-finish/summary:
+  en: 10174ca1a37eabaa
+  zh: 5a92e9ebea35229d
+/deepseek-ai-dsh-verify-before-finish/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-verify-before-finish/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-verify-before-finish/use-this-package/setup:
+  en: 485f8fa9df1f4fa4
+  zh: bc369948f2f8d903
+/deepseek-ai-dsh-verify-before-finish/use-this-package/configuration:
+  en: 1f7f6d4a5f745794
+  zh: d6d2392ec6849b19
+/deepseek-ai-dsh-verify-before-finish/understand-the-implementation:
+  en: 9f061cc8b50550e4
+  zh: a5c53cf634534681
+/deepseek-ai-dsh-verify-before-finish/further-exploration:
+  en: b73f4dc702144bff
+  zh: e92b327159cf9447
+/deepseek-ai-dsh-verify-before-finish/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message:
+  en: 9d08ee3163656f7e
+  zh: d03e5976bdadf1fc
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message/what-the-model-sees:
+  en: 291493d404bd6007
+  zh: b941a43edc1aa1df
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message/what-the-model-sees/no-check-after-the-edits:
+  en: 9ea709e2308ebf2a
+  zh: 5b8b8a11fc8f72ed
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message/what-the-model-sees/failed-check-after-the-edits:
+  en: 2b34e580b5af6fee
+  zh: 971e21a8f204b177
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message/token-effect:
+  en: 02c880757b1faee2
+  zh: bb4d65d516a18a8f
+/deepseek-ai-dsh-verify-before-finish/model-experience/verification-gap-message/kv-cache-effect:
+  en: b231517404e0316c
+  zh: 9d82571c8b31a0eb
+/deepseek-ai-dsh-verify-before-finish/known-limitations-and-deferred-work:
+  en: 05579d8312b8bb82
+  zh: 56e962d35d025d6d
+/deepseek-ai-dsh-verify-before-finish/known-limitations-and-deferred-work/dev-note:
+  en: 74de54f26ae5a7a1
+  zh: a40def3f9a42e091
