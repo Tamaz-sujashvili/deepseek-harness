@@ -103,6 +103,7 @@
     "@deepseek-ai/dsh-compaction-file-tracking": "workspace:*",
     "@deepseek-ai/dsh-edit-syntax-guard": "workspace:*",
     "@deepseek-ai/dsh-edit-near-miss": "workspace:*",
+    "@deepseek-ai/dsh-search-routing": "workspace:*",
     "@deepseek-ai/dsh-tool-code-search": "workspace:*",
     "@deepseek-ai/dsh-tool-fs-search": "workspace:*",
     "@deepseek-ai/dsh-tool-goal": "workspace:*",

@@ -526,6 +526,7 @@
       "@deepseek-ai/dsh-edit-near-miss": ["./packages/fs/edit-near-miss/src"],
       "@deepseek-ai/dsh-compaction-observation-mask": ["./packages/compaction/compaction-observation-mask/src"],
       "@deepseek-ai/dsh-compaction-file-tracking": ["./packages/compaction/compaction-file-tracking/src"],
+      "@deepseek-ai/dsh-search-routing": ["./packages/guard/search-routing/src"],
       "@deepseek-ai/dsh-tool-goal": ["./packages/goal/tool-goal/src"],
       "@deepseek-ai/dsh-tool-jobs": ["./packages/jobs/tool-jobs/src"],
       "@deepseek-ai/dsh-tool-lsp": ["./packages/lsp/tool-lsp/src"],
