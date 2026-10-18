@@ -1,0 +1,55 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/guard/search-routing/README.md
+/:
+  en: d9a331f7d687756e
+  zh: 1d6e9cb530084eb6
+/deepseek-ai-dsh-search-routing:
+  en: 2a43246cb11ccf93
+  zh: 2cfd11acf2a9e2bb
+/deepseek-ai-dsh-search-routing/summary:
+  en: 1fe25e8beb8f4f20
+  zh: 96af794aeedee945
+/deepseek-ai-dsh-search-routing/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-search-routing/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-search-routing/use-this-package/setup:
+  en: 2e3740660ffdbdde
+  zh: cbe925cee7330efd
+/deepseek-ai-dsh-search-routing/use-this-package/configuration:
+  en: adbb823895b592ff
+  zh: 6b2d859315efc44b
+/deepseek-ai-dsh-search-routing/understand-the-implementation:
+  en: 6aa49ca957f6c1f0
+  zh: 520c2bb55548ee75
+/deepseek-ai-dsh-search-routing/further-exploration:
+  en: 4ebbe146e15e7966
+  zh: 54a55c626364147a
+/deepseek-ai-dsh-search-routing/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-search-routing/model-experience/denial:
+  en: 6e40d3f19a0daaa2
+  zh: faa187520aa07cdb
+/deepseek-ai-dsh-search-routing/model-experience/denial/what-the-model-sees:
+  en: f5bfd9777454a650
+  zh: 4a176af49a91c165
+/deepseek-ai-dsh-search-routing/model-experience/denial/what-the-model-sees/example-denial:
+  en: 2aaa9e70279dd64d
+  zh: ff558795c1a7dd3c
+/deepseek-ai-dsh-search-routing/model-experience/denial/token-effect:
+  en: 4b4124d33b0f993c
+  zh: 62dde1f1883f1471
+/deepseek-ai-dsh-search-routing/model-experience/denial/kv-cache-effect:
+  en: ba87e1a97ce5a340
+  zh: c9e75f97c741463c
+/deepseek-ai-dsh-search-routing/known-limitations-and-deferred-work:
+  en: 92632c00dffa18f8
+  zh: 60b7ae4bfacfbea7
+/deepseek-ai-dsh-search-routing/known-limitations-and-deferred-work/dev-note:
+  en: 1b3d62ce8b032eb2
+  zh: 1e5416fc2a7ebd7c

@@ -101,6 +101,7 @@
     "@deepseek-ai/dsh-tool-fs": "workspace:*",
     "@deepseek-ai/dsh-compaction-observation-mask": "workspace:*",
     "@deepseek-ai/dsh-edit-syntax-guard": "workspace:*",
+    "@deepseek-ai/dsh-search-routing": "workspace:*",
     "@deepseek-ai/dsh-tool-code-search": "workspace:*",
     "@deepseek-ai/dsh-tool-fs-search": "workspace:*",
     "@deepseek-ai/dsh-tool-goal": "workspace:*",

@@ -2814,6 +2814,25 @@ export interface JsonRpcConfig {
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-sdk-jsonrpc-server -->
 
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-search-routing -->
+<a id="deepseek-aidsh-search-routing"></a>
+
+## `@deepseek-ai/dsh-search-routing`
+
+- `inject`: `tools`
+- `source`: [`packages/guard/search-routing/src/index.ts:35`](../packages/guard/search-routing/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `search-routing` (`cordis.yml` `config:`). */
+export interface Config {
+  /** Names of shell tools whose `command` argument is checked. */
+  shellTools?: string[]
+  /** Maximum characters of the denied command quoted back to the model. */
+  maxQuotedChars?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-search-routing -->
+
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-session-log-deepseek -->
 <a id="deepseek-aidsh-session-log-deepseek"></a>
 

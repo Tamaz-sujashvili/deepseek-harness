@@ -307,6 +307,12 @@
       config:
         sampleOverCapGlobResults: false
 
+    # Denies shell commands that only search the repository and names the
+    # search tools to use instead. Off unless DSH_SEARCH_ROUTING is set.
+    - id: search-routing
+      name: '@deepseek-ai/dsh-search-routing'
+      disabled: !!js '!process.env.DSH_SEARCH_ROUTING'
+
     # Semantic + structural code search over a senior-code-mcp index. Off
     # unless DSH_CODE_SEARCH_COMMAND names the senior-code-search executable.
     - id: tool-code-search
