@@ -1,0 +1,55 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/compaction/compaction-file-tracking/README.md
+/:
+  en: 4c4435e06795f785
+  zh: fcd2532a06c3ed63
+/deepseek-ai-dsh-compaction-file-tracking:
+  en: 12c9f23792d99ca4
+  zh: b1cf9e668325e210
+/deepseek-ai-dsh-compaction-file-tracking/summary:
+  en: bb22b951f5a1ccd4
+  zh: 0a3c843a9f1569f9
+/deepseek-ai-dsh-compaction-file-tracking/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-compaction-file-tracking/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-compaction-file-tracking/use-this-package/setup:
+  en: 38fba3af53eafdeb
+  zh: d9f2e728c1756edf
+/deepseek-ai-dsh-compaction-file-tracking/use-this-package/configuration:
+  en: 59f49857868e530e
+  zh: d0a74bbf0470d77f
+/deepseek-ai-dsh-compaction-file-tracking/understand-the-implementation:
+  en: 48e383ac2a89b447
+  zh: 670912555c0e59e5
+/deepseek-ai-dsh-compaction-file-tracking/further-exploration:
+  en: ccb5c894f75dc047
+  zh: dcdd7c87e49c0292
+/deepseek-ai-dsh-compaction-file-tracking/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-compaction-file-tracking/model-experience/file-lists-in-the-compaction-summary:
+  en: 69b67d194a41a121
+  zh: 98d5b8554d417f31
+/deepseek-ai-dsh-compaction-file-tracking/model-experience/file-lists-in-the-compaction-summary/what-the-model-sees:
+  en: 3958a870a4fc70d6
+  zh: 0b2c53fa43205dcf
+/deepseek-ai-dsh-compaction-file-tracking/model-experience/file-lists-in-the-compaction-summary/what-the-model-sees/example-lists:
+  en: 3d2a81feb394e244
+  zh: ed8df7af26868bca
+/deepseek-ai-dsh-compaction-file-tracking/model-experience/file-lists-in-the-compaction-summary/token-effect:
+  en: cf485d0b3f9ffcfb
+  zh: 1a542a9b2167044f
+/deepseek-ai-dsh-compaction-file-tracking/model-experience/file-lists-in-the-compaction-summary/kv-cache-effect:
+  en: 746786247ad9f224
+  zh: 6bd8a254077be3f9
+/deepseek-ai-dsh-compaction-file-tracking/known-limitations-and-deferred-work:
+  en: e5317820ce78b985
+  zh: 17f3eaa7ddb8d68d
+/deepseek-ai-dsh-compaction-file-tracking/known-limitations-and-deferred-work/dev-note:
+  en: 3ad11b50dd449e6d
+  zh: a5aadf81029ea750

@@ -296,6 +296,14 @@
       name: '@deepseek-ai/dsh-edit-syntax-guard'
       disabled: !!js '!process.env.DSH_EDIT_SYNTAX_GUARD'
 
+    # Denies an edit whose old_string misses the file only by trailing
+    # whitespace or Unicode quotes, dashes or spaces, and quotes the exact file
+    # text for the retry. Off unless DSH_EDIT_NEAR_MISS is set. Mounted before
+    # fs-observation-policy so the read-before-write decision runs first.
+    - id: edit-near-miss
+      name: '@deepseek-ai/dsh-edit-near-miss'
+      disabled: !!js '!process.env.DSH_EDIT_NEAR_MISS'
+
     - id: fs-observation-policy
       name: '@deepseek-ai/dsh-fs-observation-policy'
 
@@ -370,8 +378,15 @@
       name: '@deepseek-ai/dsh-compaction-observation-mask'
       disabled: !!js '!process.env.DSH_OBSERVATION_MASK'
 
+    # DSH_COMPACTION_FILE_TRACKING swaps in the same engine with deterministic
+    # <read-files>/<modified-files> lists appended to every summary.
     - id: compaction-basic
       name: '@deepseek-ai/dsh-compaction-basic'
+      disabled: !!js '!!process.env.DSH_COMPACTION_FILE_TRACKING'
+
+    - id: compaction-file-tracking
+      name: '@deepseek-ai/dsh-compaction-file-tracking'
+      disabled: !!js '!process.env.DSH_COMPACTION_FILE_TRACKING'
 
     # Human `/compact`: one useful reduction below the automatic threshold. Backend
     # independent, so it follows whichever compaction service this leaf mounts.

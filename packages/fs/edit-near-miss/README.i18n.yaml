@@ -1,0 +1,61 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/fs/edit-near-miss/README.md
+/:
+  en: fa8dec3ee970d79b
+  zh: 18450132dcde614c
+/deepseek-ai-dsh-edit-near-miss:
+  en: 6dc205cfa29abeec
+  zh: a2f8d615090c646b
+/deepseek-ai-dsh-edit-near-miss/summary:
+  en: e844e69ba58dbdbd
+  zh: 0de36ebe7d34bf27
+/deepseek-ai-dsh-edit-near-miss/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-edit-near-miss/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-edit-near-miss/use-this-package/setup:
+  en: 4e9cd0429f1e1bc0
+  zh: 17bb99514e234932
+/deepseek-ai-dsh-edit-near-miss/use-this-package/configuration:
+  en: 60eddbe6503d7b8d
+  zh: 56e143ca71a0c836
+/deepseek-ai-dsh-edit-near-miss/understand-the-implementation:
+  en: 3a24d0d050ae120a
+  zh: 9b7419c9810b25bf
+/deepseek-ai-dsh-edit-near-miss/further-exploration:
+  en: 47b731407fd6381e
+  zh: d255fd14e54606aa
+/deepseek-ai-dsh-edit-near-miss/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial:
+  en: bf52dc9d3bde7a39
+  zh: fdaf8563226cab34
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/what-the-model-sees:
+  en: fbff41609002c9bb
+  zh: 35bce0aaf849e3e4
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/what-the-model-sees/example-denial:
+  en: 2aaa9e70279dd64d
+  zh: ff558795c1a7dd3c
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/what-the-model-sees/example-denial-for-literal-escape-text:
+  en: df8db236c0dce203
+  zh: 7edcfe1bfcb2b218
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/what-the-model-sees/example-denial-without-quoted-text:
+  en: 385ac71c352f3dd8
+  zh: 8e614e79e02e0a28
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/token-effect:
+  en: c27f139ecd4123fc
+  zh: 71eb58815a69e88b
+/deepseek-ai-dsh-edit-near-miss/model-experience/near-miss-denial/kv-cache-effect:
+  en: ba87e1a97ce5a340
+  zh: 10c11b8a18a8f542
+/deepseek-ai-dsh-edit-near-miss/known-limitations-and-deferred-work:
+  en: 93afcb8e2dcaf1b7
+  zh: acb62477c1c10da8
+/deepseek-ai-dsh-edit-near-miss/known-limitations-and-deferred-work/dev-note:
+  en: f5e34f4cfc742f87
+  zh: 71ef23787f77000c

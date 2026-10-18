@@ -732,6 +732,38 @@ export interface ModelCompactPolicyConfig extends CompactionPolicyConfig {
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-compaction-basic -->
 
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-compaction-file-tracking -->
+<a id="deepseek-aidsh-compaction-file-tracking"></a>
+
+## `@deepseek-ai/dsh-compaction-file-tracking`
+
+- `refs`: [`BasicCompactionConfig`](#deepseek-aidsh-compaction-basic)
+- `source`: [`packages/compaction/compaction-file-tracking/src/index.ts:54`](../packages/compaction/compaction-file-tracking/src/index.ts)
+
+```ts config-catalog
+/** Configuration of {@link FileTrackingCompactionEngine}. */
+export type FileTrackingCompactionConfig = BasicCompactionConfig & FileTrackingConfig
+
+/** File-tracking settings; every other key is a `dsh-compaction-basic` setting. */
+export interface FileTrackingConfig {
+  /** Tools whose calls name files; replaces the default list. */
+  fileTools?: FileToolRule[]
+  /** Most paths kept in each list; the most recently used paths are kept. */
+  maxFiles?: number
+}
+
+/** How one tool's call names a file. */
+export interface FileToolRule {
+  /** Tool name, for example `read`. */
+  tool: string
+  /** Name of the string argument that holds the file path. */
+  argument: string
+  /** `read` for a tool that only reads the file; `modified` for one that changes it. */
+  kind: 'read' | 'modified'
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-compaction-file-tracking -->
+
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-compaction-observation-mask -->
 <a id="deepseek-aidsh-compaction-observation-mask"></a>
 
@@ -857,6 +889,25 @@ export interface Config {
 }
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-deepseek-account-platform -->
+
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-edit-near-miss -->
+<a id="deepseek-aidsh-edit-near-miss"></a>
+
+## `@deepseek-ai/dsh-edit-near-miss`
+
+- `inject`: `fs`
+- `source`: [`packages/fs/edit-near-miss/src/index.ts:52`](../packages/fs/edit-near-miss/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `edit-near-miss` (`cordis.yml` `config:`). */
+export interface Config {
+  /** Files longer than this many UTF-16 code units are not checked. */
+  maxFileChars?: number
+  /** Longest exact passage (UTF-16 code units) quoted in a hint; a longer one gets only its line range. */
+  maxQuotedChars?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-edit-near-miss -->
 
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-edit-syntax-guard -->
 <a id="deepseek-aidsh-edit-syntax-guard"></a>
