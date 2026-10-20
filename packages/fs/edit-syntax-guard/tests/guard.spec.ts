@@ -7,7 +7,7 @@
  */
 
 import { provideWorkingDirectoryFixture } from '@deepseek-ai/dsh-agent-loop-testkit'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -139,6 +139,25 @@ describe('ordering with the read-before-write policy', () => {
     expect(text(result)).not.toContain('def sub')
   })
 
+  it('runs before a policy that was registered first and occupies the slots', async () => {
+    const ctx = new Context()
+    provideWorkingDirectoryFixture(ctx)
+    await ctx.plugin(SystemPrompt)
+    await ctx.plugin(ToolRuntime)
+    await ctx.plugin(LocalFileSystem, { cwd: dir })
+    await ctx.plugin(FsPolicy)
+    await ctx.plugin(Guard, {})
+    await ctx.plugin(ToolFs)
+    const file = join(dir, 'm.py')
+    await writeFile(file, PY)
+    expect((await call(ctx, 'read', { file_path: file }, agent)).isError).toBe(false)
+    const edit = await call(ctx, 'edit', { file_path: file, old_string: 'def add(a, b):', new_string: 'def add(a, b)' }, agent)
+    expect(edit.error?.info?.code).toBe(EDIT_SYNTAX_REGRESSION)
+    const write = await call(ctx, 'write', { file_path: file, content: 'def add(a, b)\n' }, agent)
+    expect(write.error?.info?.code).toBe(EDIT_SYNTAX_REGRESSION)
+    expect(await readFile(file, 'utf8')).toBe(PY)
+  })
+
   it('checks after the file was read', async () => {
     const { ctx } = await setup({}, { policy: true })
     const file = join(dir, 'm.py')
@@ -172,9 +191,37 @@ describe('plugin lifecycle and config', () => {
     expect((await call(ctx, 'edit', { file_path: file, old_string: 'pass', new_string: 'pass)' })).isError).toBe(false)
   })
 
+  it('does not check files over maxFileBytes', async () => {
+    const { ctx } = await setup({ maxFileBytes: 10 })
+    const file = join(dir, 'm.py')
+    await writeFile(file, PY)
+    expect((await call(ctx, 'edit', { file_path: file, old_string: 'def sub(a, b):', new_string: 'def sub(a, b)' })).isError).toBe(false)
+  })
+
+  it('ignores calls without usable arguments and lets the tool run when a check fails', async () => {
+    const { ctx } = await setup()
+    const file = join(dir, 'm.py')
+    await writeFile(file, PY)
+    const target = await ctx.fs.resolve(file)
+    const absent = await ctx.fs.resolve(join(dir, 'new.py'))
+    const signal = new AbortController().signal
+    const edit = (t: typeof target, actor: object | undefined) => ctx.waterfall('fs/edit-intent', t, actor, () => undefined)
+    const write = (t: typeof target, actor: object | undefined) => ctx.waterfall('fs/write-intent', t, actor, () => undefined)
+    await expect(edit(target, undefined)).resolves.toBeUndefined()
+    await expect(edit(target, { arguments: { old_string: 1, new_string: 'x' }, signal })).resolves.toBeUndefined()
+    await expect(edit(absent, { arguments: { old_string: 'a', new_string: 'b' }, signal })).resolves.toBeUndefined()
+    await expect(edit(target, { arguments: { old_str: 'def sub(a, b):', new_str: 'def sub(a, b)' }, signal })).rejects.toMatchObject({ code: EDIT_SYNTAX_REGRESSION })
+    await expect(write(target, { arguments: { content: 1 }, signal })).resolves.toBeUndefined()
+    await expect(write(absent, { arguments: { file_text: 'def f(:\n' }, signal })).rejects.toMatchObject({ code: EDIT_SYNTAX_REGRESSION })
+    vi.spyOn(ctx.fs, 'readText').mockRejectedValueOnce(new Error('boom'))
+    await expect(edit(target, { arguments: { old_string: 'def sub(a, b):', new_string: 'def sub(a, b)' }, signal })).resolves.toBeUndefined()
+  })
+
   it('rejects invalid numeric config at load', () => {
     const ctx = new Context()
     expect(() => { Guard.apply(ctx, { maxFileBytes: 0 }) }).toThrow(/maxFileBytes/)
+    expect(() => { Guard.apply(ctx, { maxFileBytes: 1, contextLines: -1 }) }).toThrow(/contextLines/)
+    expect(() => { Guard.apply(ctx, { maxFileBytes: 1, contextLines: 0, maxProblems: 0 }) }).toThrow(/maxProblems/)
   })
 })
 
@@ -189,7 +236,10 @@ describe('pure helpers', () => {
     const e = { line: 1, column: 1, kind: 'error' as const }
     expect(addedProblems([e], [{ ...e, line: 9 }])).toEqual([])
     expect(addedProblems([], [e])).toEqual([e])
+    const m = { line: 2, column: 1, kind: 'missing' as const }
+    expect(addedProblems([e], [{ ...e, line: 9 }, m])).toEqual([m])
     expect(formatDenial('a.py', 'x', [], 2)).toContain('would introduce a syntax error in a.py')
+    expect(formatDenial('a.py', 'x\ny', [m], 0)).toContain('missing token at a.py:2:1')
     expect(firstChangedLine('a\nb\nc', 'a\nB\nc')).toBe(2)
     expect(firstChangedLine('', 'a')).toBeUndefined()
     expect(firstChangedLine('a\nb', 'a')).toBe(1)

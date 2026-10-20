@@ -1,5 +1,5 @@
 ---
-description: "一个执行前守卫：供希望在文件改变之前拒绝会引入语法错误的 edit 与 write 调用的用户与维护者使用。"
+description: "一个守卫：供希望在文件改变之前拒绝会引入语法错误的 edit 与 write 调用的用户与维护者使用。"
 kind: "package-reference"
 ---
 
@@ -9,7 +9,7 @@ kind: "package-reference"
 
 ## 概述
 
-使用 `dsh-edit-syntax-guard` 拒绝会引入语法错误的 `edit` 与 `write` 调用。调用运行之前，守卫在内存中应用该编辑，用 tree-sitter 解析编辑前后的文件；当新文本的语法问题更多时拒绝该调用。文件不会改变，模型会收到出错位置和带行号的上下文，以便重试。
+使用 `dsh-edit-syntax-guard` 拒绝会引入语法错误的 `edit` 与 `write` 调用。工具改变文件之前，守卫在内存中应用该编辑，用 tree-sitter 解析编辑前后的文件；当新文本的语法问题更多时拒绝该调用。文件不会改变，模型会收到出错位置和带行号的上下文，以便重试。
 
 ## 目录
 
@@ -27,24 +27,23 @@ kind: "package-reference"
 
 ### 设置
 
-在 `dsh-tool-fs` 与文件系统提供方之后挂载本插件。base bundle 仅在设置 `DSH_EDIT_SYNTAX_GUARD` 时挂载它。
+将本插件与文件系统提供方及 `dsh-tool-fs` 一同挂载。它相对 `dsh-fs-observation-policy` 的挂载位置无关紧要。base bundle 仅在设置 `DSH_EDIT_SYNTAX_GUARD` 时挂载它。
 
 ### 配置
 
 | 键 | 默认值 | 含义 |
 | --- | --- | --- |
-| `editTool` | `edit` | 字面编辑工具的名称。 |
-| `writeTool` | `write` | 整文件写入工具的名称。 |
 | `extensions` | Python、JavaScript、TypeScript、TSX、Go、Rust 与 Java 的 12 个扩展名 | 小写扩展名（含点）到语法的映射。其他文件不检查。 |
 | `maxFileBytes` | 2000000 | 更大的文件不检查。 |
 | `contextLines` | 2 | 摘录两侧的上下文行数。 |
+| `maxProblems` | 50 | 每次解析统计的问题数上限。已有这么多问题的文件不检查。 |
 
 -----
 
 <a id="understand-the-implementation"></a>
 ## 理解实现
 
-- 守卫监听 `tools/pre-execute`。仅当上游决定为 `allow` 或 `ask` 时才检查调用，因此其他策略的拒绝优先，也不会请人类批准一个本会被拒绝的编辑。
+- 守卫监听 `fs/edit-intent` 与 `fs/write-intent` 槽位，它们在 `edit` 与 `write` 工具内部、批准与路径解析之后运行。两个监听器都以前置方式注册，因为 `dsh-fs-observation-policy` 占用这些槽位且不调用 `next()`，而插件加载顺序并不遵循配置行的顺序。每个监听器先调用 `next()`，因此先读后写策略先做决定，且该策略的错误优先。
 - `edit` 按本地提供方的字面规则模拟：文本统一为 LF，并替换 `old_string` 的每一处出现。工具本身会拒绝的编辑（无匹配、匹配不唯一）直接放行，由工具报告自己的错误。
 - 守卫比较 `ERROR` 节点与缺失节点的数量。已有语法错误的文件仍可编辑，只要编辑不增加新的错误。
 - 守卫失败（文件不可读、语法加载错误）时记录警告并放行调用。
@@ -56,7 +55,7 @@ kind: "package-reference"
 ## 延伸阅读
 
 - 本守卫检查的 `edit` 与 `write` 工具见 [`dsh-tool-fs`](../tool-fs/README.zh.md)。
-- `tools/pre-execute` 见 [`dsh-tools` 扩展点](../../core/tools/README.zh.md#extension-points)。
+- 同一槽位上的先读后写策略见 [`dsh-fs-observation-policy`](../fs-observation-policy/README.zh.md)。
 
 -----
 
