@@ -215,9 +215,9 @@ interface IntentArgs {
  * Register the guard on the `fs/edit-intent` and `fs/write-intent` slots.
  *
  * Both slots run inside the tool, after approval and after path resolution.
- * The listener first delegates with `next()`, so a read-before-write policy
- * mounted after this plugin still decides first and its error wins; then it
- * checks the edit and throws to deny it.
+ * The listeners are prepended to the slots and first delegate with `next()`,
+ * so a read-before-write policy decides first and its error wins; then they
+ * check the edit and throw to deny it.
  *
  * @param ctx - plugin context; the listeners are effects scoped to this plugin.
  * @param config - resolved plugin configuration from schemastery.
@@ -274,14 +274,16 @@ export function apply(ctx: Context, config: Config): void {
     if (reason !== undefined) throw new EditSyntaxError(reason)
   }
 
+  // Prepended: the read-before-write policy occupies both slots without
+  // calling next(), and plugin load order does not follow cordis.yml row order.
   ctx.on('fs/edit-intent', async (target, actor, next) => {
     const intent = await next()
     await guard(target, actor, 'edit')
     return intent
-  })
+  }, { prepend: true })
   ctx.on('fs/write-intent', async (target, actor, next) => {
     const intent = await next()
     await guard(target, actor, 'write')
     return intent
-  })
+  }, { prepend: true })
 }

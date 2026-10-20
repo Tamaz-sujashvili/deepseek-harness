@@ -3,14 +3,14 @@
 # After editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/fs/edit-syntax-guard/README.md
 /:
-  en: 5028ab5d157a10ac
-  zh: 1d120e29661265f0
+  en: 5346cf9c0a532f82
+  zh: 67d3169e0bc9f018
 /deepseek-ai-dsh-edit-syntax-guard:
   en: ea90595dc02a9fa1
   zh: 369608feb3c5c773
 /deepseek-ai-dsh-edit-syntax-guard/summary:
-  en: b1c8d4f98c04e0f2
-  zh: 268dc06c30354404
+  en: ea8080a34f7c4f23
+  zh: 36eca9a7960aa2bf
 /deepseek-ai-dsh-edit-syntax-guard/table-of-contents:
   en: d152484eb41ac6b4
   zh: 9f0336825ccdaacd
@@ -18,17 +18,17 @@
   en: bbff250eba0f1b89
   zh: 0a618f05cc88ee2b
 /deepseek-ai-dsh-edit-syntax-guard/use-this-package/setup:
-  en: b17bcdac83056e97
-  zh: 3927d394cdf1b79d
+  en: 8131eb980ae31b01
+  zh: 43a9f9306fba9535
 /deepseek-ai-dsh-edit-syntax-guard/use-this-package/configuration:
-  en: 5010ae745fe23960
-  zh: 234a212dbaade45d
+  en: c66fa4c2177a3d7a
+  zh: d6aad505de96615d
 /deepseek-ai-dsh-edit-syntax-guard/understand-the-implementation:
-  en: 4a171d00eea25367
-  zh: 7ececb45ffe1fae0
+  en: e75a994dad71f89e
+  zh: fcc8b30e456dbb91
 /deepseek-ai-dsh-edit-syntax-guard/further-exploration:
-  en: 6242bfe82a3c2c90
-  zh: 5933737de4a02020
+  en: d090d773cc1b8838
+  zh: 194ab5919cc4a968
 /deepseek-ai-dsh-edit-syntax-guard/model-experience:
   en: 215e7ba838619b7b
   zh: a311da3843709f90

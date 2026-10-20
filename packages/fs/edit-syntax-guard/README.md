@@ -1,5 +1,5 @@
 ---
-description: "A pre-execution guard for users and maintainers who want edit and write calls that add syntax errors to be denied before the file changes."
+description: "A guard for users and maintainers who want edit and write calls that add syntax errors to be denied before the file changes."
 kind: "package-reference"
 ---
 
@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 
 ## Summary
 
-Use `dsh-edit-syntax-guard` to deny `edit` and `write` calls that add syntax errors. Before the call runs, the guard applies the edit in memory, parses the file before and after with tree-sitter, and denies the call when the new text has more syntax problems. The file does not change, and the model receives the location and numbered context lines so it can retry.
+Use `dsh-edit-syntax-guard` to deny `edit` and `write` calls that add syntax errors. Before the tool changes the file, the guard applies the edit in memory, parses the file before and after with tree-sitter, and denies the call when the new text has more syntax problems. The file does not change, and the model receives the location and numbered context lines so it can retry.
 
 ## Table of Contents
 
@@ -27,24 +27,23 @@ Use `dsh-edit-syntax-guard` to deny `edit` and `write` calls that add syntax err
 
 ### Setup
 
-Mount the plugin after `dsh-tool-fs` and a filesystem provider. The base bundle mounts it only when `DSH_EDIT_SYNTAX_GUARD` is set.
+Mount the plugin with a filesystem provider and `dsh-tool-fs`. Its position relative to `dsh-fs-observation-policy` does not matter. The base bundle mounts it only when `DSH_EDIT_SYNTAX_GUARD` is set.
 
 ### Configuration
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `editTool` | `edit` | Name of the literal-edit tool. |
-| `writeTool` | `write` | Name of the whole-file write tool. |
 | `extensions` | 12 extensions for Python, JavaScript, TypeScript, TSX, Go, Rust and Java | Lower-case extension (with dot) to grammar. Other files are not checked. |
 | `maxFileBytes` | 2000000 | Larger files are not checked. |
 | `contextLines` | 2 | Context lines on each side of the excerpt. |
+| `maxProblems` | 50 | Problems counted per parse. A file that already has this many problems is not checked. |
 
 -----
 
 <a id="understand-the-implementation"></a>
 ## Understand the implementation
 
-- The guard listens on `tools/pre-execute`. It checks a call only when the upstream decision is `allow` or `ask`, so a denial from another policy wins, and a human is not asked to approve an edit that would be denied.
+- The guard listens on the `fs/edit-intent` and `fs/write-intent` slots, which run inside the `edit` and `write` tools after approval and path resolution. Both listeners are prepended, because `dsh-fs-observation-policy` occupies these slots without calling `next()` and plugin load order does not follow row order. Each listener calls `next()` first, so the read-before-write policy decides first and its error wins.
 - `edit` is simulated with the local provider's literal rules: LF-normalized text, and every occurrence of `old_string` replaced. An edit that the tool itself rejects (no match, ambiguous match) passes through, so the tool reports its own error.
 - The guard compares the number of `ERROR` and missing nodes. A file that already has syntax errors can still be edited, as long as the edit does not add more.
 - A guard failure (unreadable file, grammar load error) logs a warning and allows the call.
@@ -56,7 +55,7 @@ Mount the plugin after `dsh-tool-fs` and a filesystem provider. The base bundle 
 ## Further Exploration
 
 - [`dsh-tool-fs`](../tool-fs/README.md) for the `edit` and `write` tools that this guard checks.
-- [`dsh-tools` extension points](../../core/tools/README.md#extension-points) for `tools/pre-execute`.
+- [`dsh-fs-observation-policy`](../fs-observation-policy/README.md) for the read-before-write policy on the same slots.
 
 -----
 
