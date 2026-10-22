@@ -290,8 +290,9 @@
       name: '@deepseek-ai/dsh-tool-jobs'
 
     # Denies edit/write calls that add syntax errors (tree-sitter parse of the
-    # file before and after). Off unless DSH_EDIT_SYNTAX_GUARD is set. Mounted
-    # before fs-observation-policy so the read-before-write decision runs first.
+    # file before and after). Off unless DSH_EDIT_SYNTAX_GUARD is set. Its slot
+    # listeners are prepended and call next() first, so the read-before-write
+    # decision of fs-observation-policy runs first wherever this row sits.
     - id: edit-syntax-guard
       name: '@deepseek-ai/dsh-edit-syntax-guard'
       disabled: !!js '!process.env.DSH_EDIT_SYNTAX_GUARD'

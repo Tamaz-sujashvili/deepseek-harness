@@ -82,6 +82,7 @@ export class SyntaxChecker {
     try {
       parser.setLanguage(await this.language(grammar))
       const tree = parser.parse(source)
+      /* v8 ignore next -- parse() returns null only when cancelled, and the checker never cancels. */
       if (tree === null) return [{ line: 1, column: 1, kind: 'error' }]
       try {
         const out: SyntaxProblem[] = []
@@ -97,6 +98,7 @@ export class SyntaxChecker {
           if (!node.hasError) continue
           for (let i = node.childCount - 1; i >= 0; i--) {
             const child = node.child(i)
+            /* v8 ignore next -- child(i) is null only for an index outside 0..childCount-1. */
             if (child !== null) todo.push(child)
           }
         }
