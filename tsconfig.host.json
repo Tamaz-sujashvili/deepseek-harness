@@ -450,6 +450,7 @@
     { "path": "./packages/compaction/compaction-observation-mask" },
     { "path": "./packages/compaction/compaction-file-tracking" },
     { "path": "./packages/guard/search-routing" },
+    { "path": "./packages/guard/step-budget" },
     { "path": "./packages/fs/tool-str-replace-editor" },
     { "path": "./packages/compaction/compaction" },
     { "path": "./packages/compaction/compaction-basic" },

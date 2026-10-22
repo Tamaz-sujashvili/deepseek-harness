@@ -489,6 +489,15 @@
       name: '@deepseek-ai/dsh-tool-goal'
 
     # Consecutive-repeat reminders on the tool chain.
+    # Tells the agent how many model steps remain at set thresholds and ends
+    # the turn after the budget. Off unless DSH_STEP_BUDGET is set; its value
+    # is maxSteps (a non-numeric value uses the default of 100).
+    - id: step-budget
+      name: '@deepseek-ai/dsh-step-budget'
+      disabled: !!js '!process.env.DSH_STEP_BUDGET'
+      config:
+        maxSteps: !!js 'Number.parseInt(process.env.DSH_STEP_BUDGET ?? "", 10) > 0 ? Number.parseInt(process.env.DSH_STEP_BUDGET ?? "", 10) : 100'
+
     - id: repeat-tool-reminder
       name: '@deepseek-ai/dsh-repeat-tool-reminder'
       config:
