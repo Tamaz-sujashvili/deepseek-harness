@@ -146,18 +146,23 @@ function isFilter(words: readonly string[]): boolean {
   return false
 }
 
+/** Redirections that only discard or merge stderr (`2>/dev/null`, `2>&1`); they do not change what a search does. */
+const STDERR_REDIRECT = /(^|[ \t])2>(?:[ \t]*\/dev\/null|&1)(?=[ \t|;&\n]|$)/g
+
 /**
  * Decide whether a shell command is only a repository search.
  *
  * Every `&&` / `||` / `;` statement must be either neutral (`cd`, `echo`)
  * or a pipeline whose first stage is a tree search and whose later stages
  * are filters; at least one statement must be a search. Backgrounding (`&`),
- * subshells and redirections make the command "not a search".
+ * subshells and redirections make the command "not a search", except
+ * `2>/dev/null` and `2>&1`, which are ignored.
  *
  * @param command - the shell command text.
  * @returns true when the whole command only searches the repository.
  */
 export function isOnlySearch(command: string): boolean {
+  command = command.replace(STDERR_REDIRECT, '$1')
   if (/[`$<>(){}]/.test(command.replace(/'[^']*'/g, "''"))) return false
   const tokens = tokenize(command)
   const statements: string[][][] = [[[]]]
