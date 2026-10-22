@@ -525,6 +525,7 @@
       "@deepseek-ai/dsh-edit-syntax-guard": ["./packages/fs/edit-syntax-guard/src"],
       "@deepseek-ai/dsh-compaction-observation-mask": ["./packages/compaction/compaction-observation-mask/src"],
       "@deepseek-ai/dsh-search-routing": ["./packages/guard/search-routing/src"],
+      "@deepseek-ai/dsh-step-budget": ["./packages/guard/step-budget/src"],
       "@deepseek-ai/dsh-tool-goal": ["./packages/goal/tool-goal/src"],
       "@deepseek-ai/dsh-tool-jobs": ["./packages/jobs/tool-jobs/src"],
       "@deepseek-ai/dsh-tool-lsp": ["./packages/lsp/tool-lsp/src"],
