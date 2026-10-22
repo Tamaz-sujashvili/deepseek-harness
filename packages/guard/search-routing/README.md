@@ -43,7 +43,7 @@ Mount the plugin with the tool runtime. The base bundle mounts it only when `DSH
 
 - The guard listens on `tools/pre-execute` and checks a call only when the upstream decision is `allow` or `ask`.
 - A command is a search when each `&&`, `||` or `;` statement is neutral (`cd`, `echo`) or a pipeline that starts with `rg`, `ag`, `ack`, `fd`, `git grep`, a recursive `grep`, or `find` with a name or path test, and continues only with filters such as `head`, `sort` or a non-recursive `grep`. At least one statement must be a search.
-- Command substitution, redirection, subshells and `&` make the command "not a search", so the guard never denies a command that it cannot classify.
+- Command substitution, redirection, subshells and `&` make the command "not a search", so the guard never denies a command that it cannot classify. The guard ignores `2>/dev/null` and `2>&1`, because they only discard or merge error output.
 - When none of `code_search`, `grep` and `glob` is visible to the caller, nothing is denied.
 
 -----
