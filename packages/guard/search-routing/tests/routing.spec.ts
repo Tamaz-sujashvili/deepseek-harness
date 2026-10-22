@@ -24,6 +24,10 @@ describe('isOnlySearch', () => {
     'fd edit packages',
     'ag foo',
     'find . -name "*.ts" | xargs grep -n foo',
+    'rg foo 2>&1',
+    'grep -rn foo . 2>/dev/null | head -50',
+    'find / -name "*.py" 2> /dev/null',
+    'rg -n foo src 2>&1 | head',
   ]
   const notSearches = [
     'pytest -q tests',
@@ -43,7 +47,9 @@ describe('isOnlySearch', () => {
     'find . -name x -exec rm \\;',
     'find . -name "*.log" -print0 | xargs -0 rm',
     'grep -rl foo . | xargs sed -i s/foo/bar/',
-    'rg foo 2>&1',
+    'rg foo 2> err.txt',
+    'rg foo 2>/dev/null > out.txt',
+    'rg foo 2>&1 >hits.txt',
     'timeout 10 rg foo',
     'cat <<EOF\nrg foo\nEOF',
   ]
