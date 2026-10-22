@@ -3330,6 +3330,26 @@ export type HelperLaunch = {
 ```
 <!-- END GENERATED config-catalog:@deepseek-ai/dsh-ssh -->
 
+<!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-step-budget -->
+<a id="deepseek-aidsh-step-budget"></a>
+
+## `@deepseek-ai/dsh-step-budget`
+
+- `source`: [`packages/guard/step-budget/src/index.ts:41`](../packages/guard/step-budget/src/index.ts)
+
+```ts config-catalog
+/** Plugin configuration for `step-budget` (`cordis.yml` `config:`). */
+export interface Config {
+  /** Model steps one agent may take for one user message (default 100). */
+  maxSteps?: number
+  /** Fractions of `maxSteps` at which the agent is told how many steps remain (default 0.5 and 0.8). */
+  notifyAt?: number[]
+  /** Steps allowed after the budget is reached before further steps are rejected (default 2). */
+  graceSteps?: number
+}
+```
+<!-- END GENERATED config-catalog:@deepseek-ai/dsh-step-budget -->
+
 <!-- BEGIN GENERATED config-catalog:@deepseek-ai/dsh-storage-domain -->
 <a id="deepseek-aidsh-storage-domain"></a>
 

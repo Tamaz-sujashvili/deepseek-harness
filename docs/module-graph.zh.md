@@ -313,6 +313,7 @@ flowchart TD
     pkg_execution_risk_hints["execution-risk-hints"]
     pkg_repeat_tool_reminder["repeat-tool-reminder"]
     pkg_search_routing["search-routing"]
+    pkg_step_budget["step-budget"]
     pkg_tool_call_timeout_policy["tool-call-timeout-policy"]
     pkg_verify_before_finish["verify-before-finish"]
   end
@@ -989,6 +990,9 @@ flowchart TD
   pkg_repeat_tool_reminder --> pkg_agent
   pkg_repeat_tool_reminder --> pkg_tools
   pkg_search_routing --> pkg_tools
+  pkg_step_budget --> pkg_agent
+  pkg_step_budget --> pkg_llm
+  pkg_step_budget --> pkg_tools
   pkg_tool_call_timeout_policy --> pkg_llm
   pkg_tool_call_timeout_policy --> pkg_timeout
   pkg_tool_call_timeout_policy --> pkg_tools
@@ -1735,6 +1739,7 @@ flowchart TD
 | [`execution-risk-hints`](../packages/guard/execution-risk-hints) | `guard` | [`agent`](../packages/core/agent), [`tools`](../packages/core/tools) |
 | [`repeat-tool-reminder`](../packages/guard/repeat-tool-reminder) | `guard` | [`agent`](../packages/core/agent), [`tools`](../packages/core/tools) |
 | [`search-routing`](../packages/guard/search-routing) | `guard` | [`tools`](../packages/core/tools) |
+| [`step-budget`](../packages/guard/step-budget) | `guard` | [`agent`](../packages/core/agent), [`llm`](../packages/llm/llm), [`tools`](../packages/core/tools) |
 | [`tool-call-timeout-policy`](../packages/guard/timeout-policy) | `guard` | [`llm`](../packages/llm/llm), [`timeout`](../packages/util/timeout), [`tools`](../packages/core/tools) |
 | [`verify-before-finish`](../packages/guard/verify-before-finish) | `guard` | [`agent`](../packages/core/agent), [`tools`](../packages/core/tools) |
 | [`tool-ask-user`](../packages/interaction/tool-ask-user) | `interaction` | [`agent`](../packages/core/agent), [`tools`](../packages/core/tools), [`user-questions`](../packages/interaction/user-questions) |

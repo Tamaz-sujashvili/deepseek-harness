@@ -1,0 +1,58 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write packages/guard/step-budget/README.md
+/:
+  en: 206b0ba70a5a02b9
+  zh: 722886beef2bc3c1
+/deepseek-ai-dsh-step-budget:
+  en: 4af7dfe0d3852013
+  zh: 17f28ab6d2dbbdd0
+/deepseek-ai-dsh-step-budget/summary:
+  en: 3b6c925b81ed7e29
+  zh: a86db9feaae11a26
+/deepseek-ai-dsh-step-budget/table-of-contents:
+  en: d152484eb41ac6b4
+  zh: 9f0336825ccdaacd
+/deepseek-ai-dsh-step-budget/use-this-package:
+  en: bbff250eba0f1b89
+  zh: 0a618f05cc88ee2b
+/deepseek-ai-dsh-step-budget/use-this-package/setup:
+  en: 164cdd9d0574e81b
+  zh: a16d323e7eb67dbe
+/deepseek-ai-dsh-step-budget/use-this-package/configuration:
+  en: 579a1f4b2e157da4
+  zh: 452ddeef928c6edb
+/deepseek-ai-dsh-step-budget/understand-the-implementation:
+  en: 990a9791d3923d5b
+  zh: e7b7ac98a1329f5d
+/deepseek-ai-dsh-step-budget/further-exploration:
+  en: de5753e2b54f0b98
+  zh: 9b7e1089d0b2bc4a
+/deepseek-ai-dsh-step-budget/model-experience:
+  en: 215e7ba838619b7b
+  zh: a311da3843709f90
+/deepseek-ai-dsh-step-budget/model-experience/notices:
+  en: 856f49c3698ae040
+  zh: b5456de42db4dc6f
+/deepseek-ai-dsh-step-budget/model-experience/notices/what-the-model-sees:
+  en: 1d6b3bdff7dc2e71
+  zh: 25fc79cd1791afce
+/deepseek-ai-dsh-step-budget/model-experience/notices/what-the-model-sees/example-threshold-notice:
+  en: 317469f8af7607be
+  zh: 9360d5b18a396ea7
+/deepseek-ai-dsh-step-budget/model-experience/notices/what-the-model-sees/example-notice-when-the-budget-is-reached:
+  en: 2086b5178ee16560
+  zh: defd14676d921f16
+/deepseek-ai-dsh-step-budget/model-experience/notices/token-effect:
+  en: a9ca56d8e0416f58
+  zh: 5c3ba6c4827b7e4a
+/deepseek-ai-dsh-step-budget/model-experience/notices/kv-cache-effect:
+  en: f22f33f11fb015f1
+  zh: 58875db19d312e5c
+/deepseek-ai-dsh-step-budget/known-limitations-and-deferred-work:
+  en: 6357c830c2ec6b90
+  zh: ff08fb3998e9bdf7
+/deepseek-ai-dsh-step-budget/known-limitations-and-deferred-work/dev-note:
+  en: 4a22fbab18310174
+  zh: f864c3eda90ebb5c
